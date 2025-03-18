@@ -2937,7 +2937,7 @@ var exports$1 = {
 				ctx.lineTo(target.x, previous.y);
 			}
 			ctx.lineTo(target.x, target.y);
-			return;
+			return;ZZ
 		}
 
 		if (!target.tension) {
@@ -5420,16 +5420,6 @@ core_defaults._set('doughnut', {
 
 	// The total circumference of the chart.
 	circumference: DOUBLE_PI$1,
-
-	plugins: {
-		tooltip: {
-			callbacks: {
-				label: function(context) {
-					return 'Total Earnings: ' + context.parsed.y;
-				}
-			}
-		}
-	},
 
 	// Need to override these to give a nice default
 	tooltips: {
