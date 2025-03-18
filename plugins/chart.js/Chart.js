@@ -5421,6 +5421,16 @@ core_defaults._set('doughnut', {
 	// The total circumference of the chart.
 	circumference: DOUBLE_PI$1,
 
+	plugins: {
+		tooltip: {
+			callbacks: {
+				label: function(context) {
+					return 'Total Earnings: ' + context.parsed.y;
+				}
+			}
+		}
+	},
+
 	// Need to override these to give a nice default
 	tooltips: {
 		callbacks: {

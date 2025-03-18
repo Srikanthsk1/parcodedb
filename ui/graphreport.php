@@ -104,71 +104,74 @@ if($_SESSION['useremail']==""  OR $_SESSION['role']=="User"){
 
 <?php
 
-$select = $pdo->prepare("
-    SELECT 
-        order_date, 
-        SUM(CASE WHEN c.gender = 'Male' THEN total ELSE 0 END) AS male_total,
-        SUM(CASE WHEN c.gender = 'Female' THEN total ELSE 0 END) AS female_total
-    FROM tbl_invoice i
-    JOIN tbl_customer c ON i.customer_id = c.customer_id
-    WHERE order_date BETWEEN :fromdate AND :todate
-    GROUP BY order_date
-");
-$select->bindParam(':fromdate', $_POST['date_1']);
-$select->bindParam(':todate', $_POST['date_2']);
-$select->execute();
+$select = $pdo->prepare("select order_date , sum(total) as grandtotal from tbl_invoice where order_date between :fromdate AND :todate group by order_date");
+$select->bindParam(':fromdate',$_POST['date_1']);
+$select->bindParam(':todate',$_POST['date_2']);
 
-$male_total = [];
-$female_total = [];
-$date = [];
 
-while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-    extract($row);
-    $male_total[] = $male_total;
-    $female_total[] = $female_total;
-    $date[] = $order_date;
-}
+
+
+          $select->execute();
+
+
+          $total=[];
+          $date=[];
+
+          while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+extract($row);
+
+$total[]=$grandtotal;
+$date[]=$order_date;
+
+
+
+
+          }
+
+// echo json_encode($total);
+
 
 ?>
 
-<div>
+
+
+
+
+
+            <div>
   <canvas id="myChart" style="height:250px"></canvas>
 </div>
 
-<script>
-  const ctx = document.getElementById('myChart');
 
-  new Chart(ctx, {
+
+
+            </div>
+            <script>
+const ctx = document.getElementById('myChart');
+
+const myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: <?php echo json_encode($date); ?>,
-      datasets: [
-        {
-          label: 'Male Sales',
-          backgroundColor: 'rgb(54, 162, 235)',
-          borderColor: 'rgb(54, 162, 235)',
-          data: <?php echo json_encode($male_total); ?>,
-          borderWidth: 1
-        },
-        {
-          label: 'Female Sales',
-          backgroundColor: 'rgb(255, 99, 132)',
-          borderColor: 'rgb(255, 99, 132)',
-          data: <?php echo json_encode($female_total); ?>,
-          borderWidth: 1
-        }
-      ]
+        labels: <?php echo json_encode($date); ?>,
+        datasets: [{
+            label: 'Total Earning',
+            backgroundColor: 'rgb(255,99,132)', // Default pink color
+            borderColor: 'rgb(255,99,132)',
+            data: <?php echo                                                                                                                                                                                                   json_encode($total); ?>,
+            borderWidth: 1,
+            hoverBackgroundColor: 'rgb(54, 162, 235)' // Change to blue on hover
+        }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true
+        scales: {
+            y: {
+                beginAtZero: true
+            }
         }
-      }
     }
-  });
-</script>
+});
 
+            </script>
 
 
 
@@ -308,8 +311,3 @@ include_once "footer.php";
 
 
 </script>
-
-
-
-
-
