@@ -136,42 +136,190 @@ $date[]=$order_date;
 
 
 
+<!-- thi code for card style chart representation -->
 
-
-            <div>
-  <canvas id="myChart" style="height:250px"></canvas>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Total Earnings</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="myChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Best Selling Products</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="bestsellingproduct" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Product Quantity Distribution</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="myPieChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Demo graph 1</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="anotherChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Demo graph 2</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="myPieChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Demo graph 3</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="anotherChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 
+<?php
 
+$select = $pdo->prepare("select product_name , sum(qty) as q from tbl_invoice_details where order_date between :fromdate AND :todate group by product_id");
+$select->bindParam(':fromdate',$_POST['date_1']);
+$select->bindParam(':todate',$_POST['date_2']);
 
-            </div>
-            <script>
-const ctx = document.getElementById('myChart');
+$select->execute();
 
-const myChart = new Chart(ctx, {
+$pname=[];
+$qty=[];
+
+while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+  extract($row);
+
+  $pname[]=$product_name;
+  $qty[]=$q;
+}
+
+?>
+
+<script>
+  // Existing bar chart script
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: <?php echo json_encode($date); ?>,
-        datasets: [{
-            label: 'Total Earning',
-            backgroundColor: 'rgb(255,99,132)', // Default pink color
-            borderColor: 'rgb(255,99,132)',
-            data: <?php echo                                                                                                                                                                                                   json_encode($total); ?>,
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgb(54, 162, 235)' // Change to blue on hover
-        }]
+      labels: <?php echo json_encode($date);?>,
+      datasets: [{
+        label: 'Total Earning',
+       backgroundColor:'rgb(255,99,132)',
+       borderColor:'rgb(255,99,132)',
+        data: <?php echo json_encode($total);?>,
+        borderWidth: 1
+      }]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
+      scales: {
+        y: {
+          beginAtZero: true
         }
+      }
     }
-});
+  });
 
-            </script>
+  // Existing line chart script
+  const ctx1 = document.getElementById('bestsellingproduct');
+
+  new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: <?php echo json_encode($pname);?>,
+      datasets: [{
+        label: 'Product Quantity',
+       backgroundColor:'rgb(102,255,102)',
+       borderColor:'rgb(0,102,0)',
+        data: <?php echo json_encode($qty);?>,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // New pie chart script   this chart is for product quantity distribution 
+  // this build in chart.js and google chart
+  const ctxPie = document.getElementById('myPieChart');
+
+  new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+      labels: <?php echo json_encode($pname);?>,
+      datasets: [{
+        label: 'Product Quantity',
+        data: <?php echo json_encode($qty);?>,
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 206, 86)',
+          'rgb(75, 192, 192)',
+          'rgb(153, 102, 255)',
+          'rgb(255, 159, 64)',
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 206, 86)',
+          'rgb(75, 192, 192)',
+          'rgb(153, 102, 255)',
+          'rgb(255, 159, 64)'
+        ],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Product Quantity Distribution'
+        }
+      }
+    }
+  });
+
+  
+</script>
+
 
 
 
@@ -211,52 +359,14 @@ $qty[]=$q;
 
 
 
-
-            <div>
-  <canvas id="bestsellingproduct" style="height:250px"></canvas>
-</div>
+<br>
+<br>
+<hr>
 
 
 
 
             </div>
-
-            <script>
-  const ctx1 = document.getElementById('bestsellingproduct');
-
-  new Chart(ctx1, {
-    type: 'line',
-    data: {
-      labels: <?php echo json_encode($pname);?>,
-      datasets: [{
-        label: 'Product Quantity',
-       backgroundColor:'rgb(102,255,102)',
-       borderColor:'rgb(0,102,0)',
-        data: <?php echo json_encode($qty);?>,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
 
          
           </div>
