@@ -175,10 +175,10 @@ $date[]=$order_date;
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Demo graph 1</h3>
+        <h3 class="card-title">gender distribution</h3>
       </div>
       <div class="card-body">
-        <canvas id="anotherChart" style="height:250px"></canvas>
+        <canvas id="demograph1" style="height:250px"></canvas>
       </div>
     </div>
   </div>
@@ -222,6 +222,23 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
 
   $pname[]=$product_name;
   $qty[]=$q;
+}
+
+?>
+<?php
+
+$select = $pdo->prepare("select gender, count(*) as count from tbl_customer where order_date between :fromdate AND :todate group by gender");
+$select->bindParam(':fromdate', $_POST['date_1']);
+$select->bindParam(':todate', $_POST['date_2']);
+
+$select->execute();
+
+$gender = [];
+$count = [];
+
+while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+  $gender[] = $row['gender'];
+  $count[] = $row['count'];
 }
 
 ?>
@@ -316,49 +333,38 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
       }
     }
   });
+  const ctxPie1 = document.getElementById('demograph1');
+
+  new Chart(ctxPie1, {
+    type: 'pie',
+    data: {
+      labels: <?php echo json_encode($gender);?>,
+      datasets: [{
+        label: 'gender distribution',
+        data: <?php echo json_encode($count);?>,
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+        ],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'gender distribution'
+        }
+      }
+    }
+  });
 
   
 </script>
-
-
-
-
-
-<?php
-
-$select = $pdo->prepare("select product_name , sum(qty) as q from tbl_invoice_details where order_date between :fromdate AND :todate group by product_id");
-$select->bindParam(':fromdate',$_POST['date_1']);
-$select->bindParam(':todate',$_POST['date_2']);
-
-
-
-
-          $select->execute();
-
-
-          $pname=[];
-          $qty=[];
-
-          while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-extract($row);
-
-$pname[]=$product_name;
-$qty[]=$q;
-
-
-
-
-          }
-
-// echo json_encode($total);
-
-
-?>
-
-
-
-
-
 <br>
 <br>
 <hr>
