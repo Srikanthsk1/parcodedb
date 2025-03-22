@@ -336,7 +336,7 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
   const ctxPie1 = document.getElementById('demograph1');
 
   new Chart(ctxPie1, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: <?php echo json_encode($gender);?>,
       datasets: [{
