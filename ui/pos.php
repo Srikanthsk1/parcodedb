@@ -44,12 +44,13 @@ if(isset($_POST['btnsaveorder'])){
   $age = $currentDate->diff($dobDate)->y;
 
   // Insert customer data into tbl_customer
-  $insertCustomer = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone) VALUES (:name, :gender, :dob, :age, :phone)");
+  $insertCustomer = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone, order_date) VALUES (:name, :gender, :dob, :age, :phone, :order_date)");
   $insertCustomer->bindParam(':name', $name);
   $insertCustomer->bindParam(':gender', $gender);
   $insertCustomer->bindParam(':dob', $dob);
   $insertCustomer->bindParam(':age', $age);
   $insertCustomer->bindParam(':phone', $phone);
+  $insertCustomer->bindParam(':order_date', $orderdate);
   $insertCustomer->execute();
 
   $arr_pid     = $_POST['pid_arr'];
@@ -60,7 +61,7 @@ if(isset($_POST['btnsaveorder'])){
   $arr_price   = $_POST['price_c_arr'];
   $arr_total   = $_POST['saleprice_arr'];
 
-  $insert=$pdo->prepare("insert into tbl_invoice (order_date,subtotal,discount,sgst,cgst,total,payment_type,due,paid) values(:orderdate,:subtotal,:discount,:sgst,:cgst,:total,:payment_type,:due,:paid)");
+  $insert=$pdo->prepare("INSERT INTO tbl_invoice (order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid) VALUES (:orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid)");
   $insert->bindParam(':orderdate',$orderdate);
   $insert->bindParam(':subtotal',$subtotal);
   $insert->bindParam(':discount',$discount);

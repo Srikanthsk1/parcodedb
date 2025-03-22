@@ -345,6 +345,7 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
+          'rgb(75, 192, 192)'
         ],
         hoverOffset: 4
       }]

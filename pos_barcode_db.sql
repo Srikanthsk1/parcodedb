@@ -69,24 +69,25 @@ CREATE TABLE `tbl_customer` (
   `gender` varchar(10) NOT NULL,
   `dob` date NOT NULL,
   `age` int(11) NOT NULL,
-  `phone` varchar(15) NOT NULL
+  `phone` varchar(15) NOT NULL,
+  `order_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_customer`
 --
 
-INSERT INTO `tbl_customer` (`customer_id`, `name`, `gender`, `dob`, `age`, `phone`) VALUES
-(5, 'Srikanth', 'Male', '2004-02-22', 21, '6374402154'),
-(6, 'Srikanth', 'Male', '2025-03-14', 0, '6374402154'),
-(7, 'pos_barcode_db', 'Male', '2025-03-12', 0, '06374402154'),
-(8, 'SRIKANTH m MANI', 'Male', '2025-03-19', 0, '06374402154'),
-(9, 'SRIKANTH m MANI', 'Other', '2025-03-18', 0, '06374402154'),
-(10, 'SRIKANTH m MANI', 'Male', '2025-03-05', 0, '06374402154'),
-(11, 'SRIKANTH m MANI', 'Male', '2025-03-11', 0, '06374402154'),
-(12, '44', 'Male', '2025-03-05', 0, '06374402154'),
-(13, 'SRIKANTH m MANI', 'Male', '2022-03-18', 3, '06374402154'),
-(14, 'SRIKANTH m MANI', 'Male', '1980-03-22', 45, '06374402154');
+INSERT INTO `tbl_customer` (`customer_id`, `name`, `gender`, `dob`, `age`, `phone`, `order_date`) VALUES
+(5, 'Srikanth', 'Male', '2004-02-22', 21, '6374402154', '2023-03-01'),
+(6, 'Srikanth', 'Male', '2025-03-14', 0, '6374402154', '2023-03-02'),
+(7, 'pos_barcode_db', 'Male', '2025-03-12', 0, '06374402154', '2023-03-03'),
+(8, 'SRIKANTH m MANI', 'Male', '2025-03-19', 0, '06374402154', '2023-03-04'),
+(9, 'SRIKANTH m MANI', 'Other', '2025-03-18', 0, '06374402154', '2023-03-05'),
+(10, 'SRIKANTH m MANI', 'Male', '2025-03-05', 0, '06374402154', '2023-03-06'),
+(11, 'SRIKANTH m MANI', 'Male', '2025-03-11', 0, '06374402154', '2023-03-07'),
+(12, '44', 'Male', '2025-03-05', 0, '06374402154', '2023-03-08'),
+(13, 'SRIKANTH m MANI', 'Male', '2022-03-18', 3, '06374402154', '2023-03-09'),
+(14, 'SRIKANTH m MANI', 'Male', '1980-03-22', 45, '06374402154', '2023-03-10');
 
 -- --------------------------------------------------------
 
