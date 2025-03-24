@@ -37,6 +37,8 @@ if(isset($_POST['btnsaveorder'])){
   $dob           = isset($_POST['txtdob']) ? $_POST['txtdob'] : '';
   $age           = isset($_POST['txtage']) ? $_POST['txtage'] : '';
   $phone         = isset($_POST['txtphone']) ? $_POST['txtphone'] : '';
+  $city          = isset($_POST['txtcity']) ? $_POST['txtcity'] : '';
+  $zip_code      = isset($_POST['txtzipcode']) ? $_POST['txtzipcode'] : '';
   
   // Calculate age based on dob
   $dobDate = new DateTime($dob);
@@ -44,12 +46,14 @@ if(isset($_POST['btnsaveorder'])){
   $age = $currentDate->diff($dobDate)->y;
 
   // Insert customer data into tbl_customer
-  $insertCustomer = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone, order_date) VALUES (:name, :gender, :dob, :age, :phone, :order_date)");
+  $insertCustomer = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone, city, zipcode, order_date) VALUES (:name, :gender, :dob, :age, :phone, :city, :zipcode, :order_date)");
   $insertCustomer->bindParam(':name', $name);
   $insertCustomer->bindParam(':gender', $gender);
   $insertCustomer->bindParam(':dob', $dob);
   $insertCustomer->bindParam(':age', $age);
   $insertCustomer->bindParam(':phone', $phone);
+  $insertCustomer->bindParam(':city', $city);
+  $insertCustomer->bindParam(':zipcode', $zip_code);
   $insertCustomer->bindParam(':order_date', $orderdate);
   $insertCustomer->execute();
 
@@ -194,18 +198,18 @@ th{background: #eee;}
     <label for="txtphone">Phone</label>
     <input type="text" class="form-control" name="txtphone" id="txtphone" required>
   </div>
-  
-  <!-- <div class="form-group col-md-2">
-    <label for="dobToggle">Manual Age</label>
-    <br>
-    <input type="checkbox" id="dobToggle">
-  </div> -->
-
+  <div class="form-group col-md-2">
+    <label for="txtcity">City</label>
+    <input type="text" class="form-control" name="txtcity" id="txtcity" required>
+  </div>
+  <div class="form-group col-md-2">
+    <label for="txtzipcode">Zip Code</label>
+    <input type="text" class="form-control" name="txtzipcode" id="txtzipcode" required>
+  </div>
   <div class="form-group col-md-2">
     <label for="txtdob">Date of Birth</label>
     <input type="date" class="form-control" name="txtdob" id="txtdob" required>
   </div>
-
   <div class="form-group col-md-2">
     <label for="txtage">Age</label>
     <label for="dobToggle"> (Manual Age)</label>

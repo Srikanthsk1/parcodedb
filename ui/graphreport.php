@@ -187,10 +187,10 @@ $date[]=$order_date;
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Demo graph 2</h3>
+        <h3 class="card-title">Gender Distribution by Month</h3>
       </div>
       <div class="card-body">
-        <canvas id="myPieChart" style="height:250px"></canvas>
+        <canvas id="genderChart" style="height:250px"></canvas>
       </div>
     </div>
   </div>
@@ -205,6 +205,7 @@ $date[]=$order_date;
     </div>
   </div>
 </div>
+
 
 <?php
 
@@ -239,6 +240,29 @@ $count = [];
 while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
   $gender[] = $row['gender'];
   $count[] = $row['count'];
+}
+
+?>
+<?php
+
+$select = $pdo->prepare("SELECT DATE_FORMAT(order_date, '%Y-%m') as month, 
+                                SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) as male_count, 
+                                SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) as female_count 
+                         FROM tbl_customer 
+                         WHERE order_date BETWEEN :fromdate AND :todate 
+                         GROUP BY month");
+$select->bindParam(':fromdate', $_POST['date_1']);
+$select->bindParam(':todate', $_POST['date_2']);
+$select->execute();
+
+$months = [];
+$maleCounts = [];
+$femaleCounts = [];
+
+while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+  $months[] = $row['month'];
+  $maleCounts[] = $row['male_count'];
+  $femaleCounts[] = $row['female_count'];
 }
 
 ?>
@@ -364,7 +388,49 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
     }
   });
 
-  
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctxGender = document.getElementById('genderChart').getContext('2d');
+
+    new Chart(ctxGender, {
+      type: 'line',
+      data: {
+        labels: <?php echo json_encode($months); ?>,
+        datasets: [
+          {
+            label: 'Male',
+            data: <?php echo json_encode($maleCounts); ?>,
+            borderColor: 'blue',
+            backgroundColor: 'rgba(0, 0, 255, 0.2)',
+            borderWidth: 2,
+          },
+          {
+            label: 'Female',
+            data: <?php echo json_encode($femaleCounts); ?>,
+            borderColor: 'red',
+            backgroundColor: 'rgba(255, 0, 0, 0.2)',
+            borderWidth: 2,
+          }
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Gender Distribution by Month'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      },
+    });
+  });
 </script>
 <br>
 <br>
@@ -407,24 +473,14 @@ include_once "footer.php";
 <!-- Tempusdominus Bootstrap 4 -->
 <script src="../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 
-
-
-
 <script>
+  //Date picker
+  $('#date_1').datetimepicker({
+    format: 'YYYY-MM-DD'
+  });
 
- //Date picker
- $('#date_1').datetimepicker({
-        format: 'YYYY-MM-DD'
-    });
-
-
-
-    //Date picker
- $('#date_2').datetimepicker({
-        format: 'YYYY-MM-DD'
-    });
-
-
-
-
+  //Date picker
+  $('#date_2').datetimepicker({
+    format: 'YYYY-MM-DD'
+  });
 </script>
