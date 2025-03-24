@@ -224,9 +224,20 @@ $(function() {
 
 
 <?php
+// unset($_SESSION['status']);
+//   }
+  ?>
+  <?php
 unset($_SESSION['status']);
   }
   ?>
+<script>
+    // Disable Back and Forward buttons
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(0); // Reloads the current page, preventing navigation
+    };
+</script>
 
 
 

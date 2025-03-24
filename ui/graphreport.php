@@ -197,14 +197,27 @@ $date[]=$order_date;
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Demo graph 3</h3>
+        <h3 class="card-title">City Based Sales Percentage by Month</h3>
       </div>
       <div class="card-body">
-        <canvas id="anotherChart" style="height:250px"></canvas>
+        <canvas id="citySalesPercentageChart" style="height:250px"></canvas>
       </div>
     </div>
   </div>
 </div>
+
+<!-- <div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">City Based Sales Percentage by Month</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="citySalesPercentageChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+</div> -->
 
 
 <?php
@@ -263,6 +276,44 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
   $months[] = $row['month'];
   $maleCounts[] = $row['male_count'];
   $femaleCounts[] = $row['female_count'];
+}
+
+?>
+<?php
+
+$select = $pdo->prepare("SELECT DATE_FORMAT(tbl_invoice.order_date, '%Y-%m') as month, 
+                                tbl_customer.city, 
+                                SUM(tbl_invoice.total) as sales 
+                         FROM tbl_customer 
+                         JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id 
+                         WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate 
+                         GROUP BY month, tbl_customer.city");
+$select->bindParam(':fromdate', $_POST['date_1']);
+$select->bindParam(':todate', $_POST['date_2']);
+$select->execute();
+
+$citySalesData = [];
+while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+  $citySalesData[$row['month']][$row['city']] = $row['sales'];
+}
+
+$months = array_keys($citySalesData);
+$cities = [];
+foreach ($citySalesData as $month => $cityData) {
+  foreach ($cityData as $city => $sales) {
+    if (!in_array($city, $cities)) {
+      $cities[] = $city;
+    }
+  }
+}
+
+$salesData = [];
+foreach ($months as $month) {
+  $monthlySales = [];
+  foreach ($cities as $city) {
+    $monthlySales[] = isset($citySalesData[$month][$city]) ? $citySalesData[$month][$city] : 0;
+  }
+  $salesData[] = $monthlySales;
 }
 
 ?>
@@ -426,6 +477,55 @@ while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
         scales: {
           y: {
             beginAtZero: true
+          }
+        }
+      },
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctxCityPercentage = document.getElementById('citySalesPercentageChart').getContext('2d');
+
+    const months = <?php echo json_encode($months); ?>;
+    const cities = <?php echo json_encode($cities); ?>;
+    const salesData = <?php echo json_encode($salesData); ?>;
+
+    const datasets = cities.map((city, index) => {
+      const citySales = salesData.map(monthlySales => monthlySales[index]);
+      return {
+        label: city,
+        data: citySales,
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1
+      };
+    });
+
+    new Chart(ctxCityPercentage, {
+      type: 'bar',
+      data: {
+        labels: months,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'City Based Sales Percentage by Month'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            stacked: true
+          },
+          x: {
+            stacked: true
           }
         }
       },

@@ -57,6 +57,8 @@ if(isset($_POST['btnsaveorder'])){
   $insertCustomer->bindParam(':order_date', $orderdate);
   $insertCustomer->execute();
 
+  $customer_id = $pdo->lastInsertId();
+
   $arr_pid     = $_POST['pid_arr'];
   $arr_barcode = $_POST['barcode_arr'];
   $arr_name    = $_POST['product_arr'];
@@ -65,7 +67,8 @@ if(isset($_POST['btnsaveorder'])){
   $arr_price   = $_POST['price_c_arr'];
   $arr_total   = $_POST['saleprice_arr'];
 
-  $insert=$pdo->prepare("INSERT INTO tbl_invoice (order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid) VALUES (:orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid)");
+  $insert=$pdo->prepare("INSERT INTO tbl_invoice (customer_id, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid) VALUES (:customer_id, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid)");
+  $insert->bindParam(':customer_id', $customer_id);
   $insert->bindParam(':orderdate',$orderdate);
   $insert->bindParam(':subtotal',$subtotal);
   $insert->bindParam(':discount',$discount);
@@ -88,8 +91,9 @@ if(isset($_POST['btnsaveorder'])){
         $update->execute();
       }
 
-      $insert=$pdo->prepare("insert into tbl_invoice_details (invoice_id,barcode,product_id,product_name,qty,rate,saleprice,order_date) values (:invid,:barcode,:pid,:name,:qty,:rate,:saleprice,:order_date)");
+      $insert=$pdo->prepare("insert into tbl_invoice_details (invoice_id, customer_id, barcode, product_id, product_name, qty, rate, saleprice, order_date) values (:invid, :customer_id, :barcode, :pid, :name, :qty, :rate, :saleprice, :order_date)");
       $insert->bindParam(':invid',$invoice_id);
+      $insert->bindParam(':customer_id', $customer_id);
       $insert->bindParam(':barcode',$arr_barcode[$i]);
       $insert->bindParam(':pid',$arr_pid[$i]);
       $insert->bindParam(':name',$arr_name[$i]);
