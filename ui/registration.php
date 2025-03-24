@@ -192,7 +192,7 @@ $_SESSION['status']="Email already exists. Create Account From New Email";
                         <select class="form-control" name="txtselect_option" required>
                           <option value="" disabled selected>Select Role</option>
                           <option>Admin</option>
-                          <option>Vendor</option>
+                          <option>User</option>
                          
                         </select>
                       </div>
