@@ -1,35 +1,27 @@
 <?php
 
-
 error_reporting(0);
 include_once 'connectdb.php';
 session_start();
-if($_SESSION['useremail']==""  OR $_SESSION['role']=="User"){
-
+if($_SESSION['useremail']==""){
     header('location:../index.php');
-    
-    }
-  
-  
-    if($_SESSION['role']=="Admin"){
-      include_once'header.php';
-    }else{
-    
-      include_once'headeruser.php';
-    }
+}
 
+if($_SESSION['role']=="Admin"){
+  include_once'header.php';
+}else{
+  include_once'headeruser.php';
+}
 
 ?>
 <!-- ChartJS -->
 <script src="../plugins/chart.js/Chart.min.js"></script>
 
+<!-- daterange picker -->
+<link rel="stylesheet" href="../plugins/daterangepicker/daterangepicker.css">
 
-
- <!-- daterange picker -->
- <link rel="stylesheet" href="../plugins/daterangepicker/daterangepicker.css">
-
-  <!-- Tempusdominus Bootstrap 4 -->
-  <link rel="stylesheet" href="../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet" href="../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">

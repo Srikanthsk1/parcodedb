@@ -3,21 +3,15 @@ error_reporting(0);
 include_once 'connectdb.php';
 session_start();
 
-
-if($_SESSION['useremail']==""  OR $_SESSION['role']=="User"){
-
+if($_SESSION['useremail']==""){
   header('location:../index.php');
-  
-  }
+}
 
-
-  if($_SESSION['role']=="Admin"){
-    include_once'header.php';
-  }else{
-  
-    include_once'headeruser.php';
-  }
-
+if($_SESSION['role']=="Admin"){
+  include_once'header.php';
+}else{
+  include_once'headeruser.php';
+}
 
 ?>
 

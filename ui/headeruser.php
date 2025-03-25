@@ -94,6 +94,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
           </li>
+            <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-bar"></i>
+              <p>
+              Sales Report
+              <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+              <a href="graphreport.php" class="nav-link">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                Graph Report
+                </p>
+              </a>
+              </li>
+              <li class="nav-item">
+              <a href="tablereport.php" class="nav-link">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                Table Report
+                </p>
+              </a>
+              </li>
+            </ul>
+            </li>
 
        
           <li class="nav-item">
