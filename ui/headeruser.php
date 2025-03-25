@@ -94,7 +94,35 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
           </li>
-            <li class="nav-item has-treeview">
+          <li class="nav-item">
+            <a href="category.php" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Category
+                
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="addproduct.php" class="nav-link">
+            <i class="nav-icon fas fa-edit"></i>
+              <p>
+               Product
+              
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="productlist.php" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+              <p>
+               Product List
+              
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-bar"></i>
               <p>
@@ -120,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </a>
               </li>
             </ul>
-            </li>
+          </li>
 
        
           <li class="nav-item">
