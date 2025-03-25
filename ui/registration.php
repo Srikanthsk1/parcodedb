@@ -54,76 +54,47 @@ $_SESSION['status_code']="warning";
 
 
 
-if(isset($_POST['btnsave'])){
+if (isset($_POST['btnsave'])) {
+    $username = $_POST['txtname'];
+    $useremail = $_POST['txtemail'];
+    $userpassword = $_POST['txtpassword'];
+    $userrole = $_POST['txtselect_option'];
 
-$username = $_POST['txtname'];
-$useremail = $_POST['txtemail'];
-$userpassword= $_POST['txtpassword'];
-$userrole= $_POST['txtselect_option'];
+    // Additional fields for User role
+    $company = isset($_POST['txtcompany']) ? $_POST['txtcompany'] : null;
+    $phone = isset($_POST['txtphone']) ? $_POST['txtphone'] : null;
+    $address = isset($_POST['txtaddress']) ? $_POST['txtaddress'] : null;
 
-if(isset($_POST['txtemail'])){
+    if (isset($_POST['txtemail'])) {
+        $select = $pdo->prepare("SELECT useremail FROM tbl_user WHERE useremail = :email");
+        $select->bindParam(':email', $useremail);
+        $select->execute();
 
-$select=$pdo->prepare("select useremail from tbl_user where useremail='$useremail'");
+        if ($select->rowCount() > 0) {
+            $_SESSION['status'] = "Email already exists. Create Account From New Email";
+            $_SESSION['status_code'] = "warning";
+        } else {
+            // Insert query with additional fields for User role
+            $insert = $pdo->prepare("INSERT INTO tbl_user (username, useremail, userpassword, role, company_name, phone, address) 
+                                     VALUES (:name, :email, :password, :role, :company, :phone, :address)");
 
-$select->execute();
+            $insert->bindParam(':name', $username);
+            $insert->bindParam(':email', $useremail);
+            $insert->bindParam(':password', $userpassword);
+            $insert->bindParam(':role', $userrole);
+            $insert->bindParam(':company', $company);
+            $insert->bindParam(':phone', $phone);
+            $insert->bindParam(':address', $address);
 
-
-if($select->rowCount()>0){
-
-
-
-$_SESSION['status']="Email already exists. Create Account From New Email";
-  $_SESSION['status_code']="warning";
-
-}else{
-
-  $insert=$pdo->prepare("insert into tbl_user (username,useremail,userpassword,role) values(:name,:email,:password,:role)");
-
-  $insert->bindParam(':name',$username);
-  $insert->bindParam(':email',$useremail);
-  $insert->bindParam(':password',$userpassword);
-  $insert->bindParam(':role',$userrole);
-  
-  if($insert->execute()){
-  
-  
-  
-  $_SESSION['status']="Insert successfully the user into the database";
-  $_SESSION['status_code']="success";
-  
-  }else{
-  
-  
-  
-  $_SESSION['status']="Error inserting the user into the database";
-  $_SESSION['status_code']="error";
-  
-  }
-
-
-
-}
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if ($insert->execute()) {
+                $_SESSION['status'] = "User registered successfully";
+                $_SESSION['status_code'] = "success";
+            } else {
+                $_SESSION['status'] = "Error inserting the user into the database";
+                $_SESSION['status_code'] = "error";
+            }
+        }
+    }
 }
 
 
@@ -189,12 +160,30 @@ $_SESSION['status']="Email already exists. Create Account From New Email";
                  
                   <div class="form-group">
                         <label>Role</label>
-                        <select class="form-control" name="txtselect_option" required>
+                        <select class="form-control" name="txtselect_option" id="roleSelect" required>
                           <option value="" disabled selected>Select Role</option>
-                          <option>Admin</option>
-                          <option>User</option>
+                          <option value="Admin">Admin</option>
+                          <option value="User">User</option>
                          
                         </select>
+                      </div>
+               
+<!-- Additional fields for User role -->
+                      <div id="userFields" style="display: none;">
+                          <div class="form-group">
+                              <label for="exampleInputCompany">Company Name</label>
+                              <input type="text" class="form-control" placeholder="Enter Company Name" name="txtcompany">
+                          </div>
+
+                          <div class="form-group">
+                              <label for="exampleInputPhone">Phone Number</label>
+                              <input type="text" class="form-control" placeholder="Enter Phone Number" name="txtphone">
+                          </div>
+
+                          <div class="form-group">
+                              <label for="exampleInputAddress">Address</label>
+                              <textarea class="form-control" placeholder="Enter Address" name="txtaddress"></textarea>
+                          </div>
                       </div>
                
 
@@ -203,6 +192,17 @@ $_SESSION['status']="Email already exists. Create Account From New Email";
                 </div>
               </form>
 
+<script>
+                  // Show additional fields when "User" role is selected
+                  document.getElementById('roleSelect').addEventListener('change', function () {
+                      const userFields = document.getElementById('userFields');
+                      if (this.value === 'User') {
+                          userFields.style.display = 'block';
+                      } else {
+                          userFields.style.display = 'none';
+                      }
+                  });
+              </script>
 
 </div>
 
