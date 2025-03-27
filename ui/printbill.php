@@ -93,68 +93,68 @@ while ($product = $select->fetch(PDO::FETCH_OBJ)) {
 // Add totals and other details
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'SUBTOTAL(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->subtotal, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'SUBTOTAL(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->subtotal, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'DISCOUNT %', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->discount, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'DISCOUNT %', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->discount, 1, 1, 'C');
 
 $discount_rs = $row->discount / 100 * $row->subtotal;
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'DISCOUNT (Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $discount_rs, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'DISCOUNT (Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $discount_rs, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'SGST %', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->sgst, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'SGST %', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->sgst, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'CGST %', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->cgst, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'CGST %', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->cgst, 1, 1, 'C');
 
 $sgst_rs = $row->sgst / 100 * $row->subtotal;
 $cgst_rs = $row->cgst / 100 * $row->subtotal;
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'SGST(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $sgst_rs, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'SGST(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $sgst_rs, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'CGST(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $cgst_rs, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'CGST(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $cgst_rs, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 10);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'G-TOTAL(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->total, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'G-TOTAL(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->total, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'PAID(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->paid, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'PAID(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->paid, 1, 1, 'C');
 
 $pdf->SetX(7);
 $pdf->SetFont('courier', 'B', 8);
-$pdf->Cell(20, 5, '', 0, 0, 'L');
-$pdf->Cell(25, 5, 'DUE(Rs)', 1, 0, 'C');
-$pdf->Cell(20, 5, $row->due, 1, 1, 'C');
+$pdf->Cell(0.1, 5, '', 0, 0, 'L');
+$pdf->Cell(34, 5, 'DUE(Rs)', 1, 0, 'C');
+$pdf->Cell(31, 5, $row->due, 1, 1, 'C');
 
 // Add footer
 $pdf->SetX(7);
