@@ -131,86 +131,98 @@ $date[]=$order_date;
 <!-- thi code for card style chart representation -->
 
 <div class="row">
+  <!-- Total Earnings -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Total Earnings</h3>
       </div>
       <div class="card-body">
-        <canvas id="myChart" style="height:250px"></canvas>
+        <canvas id="myChart" style="height:250px;"></canvas>
       </div>
     </div>
   </div>
+
+  <!-- Best Selling Products -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Best Selling Products</h3>
       </div>
       <div class="card-body">
-        <canvas id="bestsellingproduct" style="height:250px"></canvas>
+        <canvas id="bestsellingproduct" style="height:250px;"></canvas>
       </div>
     </div>
   </div>
 </div>
 
 <div class="row">
+  <!-- Product Quantity Distribution -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Product Quantity Distribution</h3>
       </div>
       <div class="card-body">
-        <canvas id="myPieChart" style="height:250px"></canvas>
+        <canvas id="myPieChart" style="height:250px;"></canvas>
       </div>
     </div>
   </div>
+
+  <!-- Gender Distribution -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">gender distribution</h3>
+        <h3 class="card-title">Gender Distribution</h3>
       </div>
       <div class="card-body">
-        <canvas id="demograph1" style="height:250px"></canvas>
+        <canvas id="demograph1" style="height:250px;"></canvas>
       </div>
     </div>
   </div>
 </div>
+
 <div class="row">
+  <!-- Gender Distribution by Month -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Gender Distribution by Month</h3>
       </div>
       <div class="card-body">
-        <canvas id="genderChart" style="height:250px"></canvas>
+        <canvas id="genderChart" style="height:250px;"></canvas>
       </div>
     </div>
   </div>
+
+  <!-- City Based Sales Percentage -->
   <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">City Based Sales Percentage by Month</h3>
       </div>
-      <div class="card-body">
-        <canvas id="citySalesPercentageChart" style="height:250px"></canvas>
+      <div class="card-body" style="overflow-x: auto; white-space: nowrap;">
+        <div style="min-width: 2000px;">
+          <canvas id="citySalesPercentageChart" style="height:250px;"></canvas>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- <div class="row">
+<div class="row">
+  <!-- Year-over-Year Growth -->
   <div class="col-md-12">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">City Based Sales Percentage by Month</h3>
+        <h3 class="card-title">Year-over-Year (YoY) Sales Growth</h3>
       </div>
       <div class="card-body">
-        <canvas id="citySalesPercentageChart" style="height:250px"></canvas>
+        <canvas id="yoyGrowthChart" style="height:400px;"></canvas>
       </div>
     </div>
   </div>
-</div> -->
-
+</div>
 
 <?php
 
@@ -308,6 +320,48 @@ foreach ($months as $month) {
   $salesData[] = $monthlySales;
 }
 
+?>
+<?php
+$select = $pdo->prepare("
+  SELECT 
+    YEAR(order_date) AS year, 
+    MONTH(order_date) AS month, 
+    SUM(total) AS sales 
+  FROM tbl_invoice 
+  WHERE order_date BETWEEN :fromdate AND :todate 
+  GROUP BY year, month 
+  ORDER BY year, month
+");
+
+$fromDate = $_POST['date_1']; // Use the provided fromdate
+$toDate = $_POST['date_2'];   // Use the provided todate
+$select->bindParam(':fromdate', $fromDate);
+$select->bindParam(':todate', $toDate);
+$select->execute();
+
+$yoyData = [];
+while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+  $yoyData[$row['year']][$row['month']] = $row['sales'];
+}
+
+// Prepare data for Chart.js
+$yoyMonths = [];
+$lastYearSales = [];
+$currentYearSales = [];
+
+foreach ($yoyData as $year => $data) {
+  foreach ($data as $month => $sales) {
+    $monthLabel = date('F', mktime(0, 0, 0, $month, 10)); // Convert month number to name
+    if (!in_array($monthLabel, $yoyMonths)) {
+      $yoyMonths[] = $monthLabel;
+    }
+    if ($year == date('Y', strtotime($fromDate)) - 1) {
+      $lastYearSales[] = $sales;
+    } elseif ($year == date('Y', strtotime($fromDate))) {
+      $currentYearSales[] = $sales;
+    }
+  }
+}
 ?>
 
 <script>
@@ -484,45 +538,133 @@ foreach ($months as $month) {
     const salesData = <?php echo json_encode($salesData); ?>;
 
     const datasets = cities.map((city, index) => {
-      const citySales = salesData.map(monthlySales => monthlySales[index]);
-      return {
-        label: city,
-        data: citySales,
-        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
-        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
-        borderWidth: 1
-      };
+        const citySales = salesData.map(monthlySales => monthlySales[index]);
+        return {
+            label: city,
+            data: citySales,
+            backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+            borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+            borderWidth: 1,
+            barThickness: 20, // Set a fixed bar thickness
+            maxBarThickness: 40 // Set a maximum bar thickness for responsiveness
+        };
     });
 
     new Chart(ctxCityPercentage, {
-      type: 'bar',
-      data: {
-        labels: months,
-        datasets: datasets
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'City Based Sales Percentage by Month'
-          }
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: datasets
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            stacked: true
-          },
-          x: {
-            stacked: true
-          }
-        }
-      },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Allow the chart to resize dynamically
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'City Based Sales Percentage by Month'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stacked: true,
+                    ticks: {
+                        font: {
+                            size: 14 // Increase font size for better visibility
+                        }
+                    }
+                },
+                x: {
+                    stacked: true,
+                    ticks: {
+                        font: {
+                            size: 14// Increase font size for better visibility
+                        }
+                    },
+                    grid: {
+                        display: false // Optional: Remove grid lines for a cleaner look
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 10,
+                    top: 10,
+                    bottom: 10
+                }
+            }
+        },
     });
   });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctxYoY = document.getElementById('yoyGrowthChart').getContext('2d');
+
+    const yoyMonths = <?php echo json_encode($yoyMonths); ?>;
+    const lastYearSales = <?php echo json_encode($lastYearSales); ?>;
+    const currentYearSales = <?php echo json_encode($currentYearSales); ?>;
+
+    new Chart(ctxYoY, {
+        type: 'line',
+        data: {
+            labels: yoyMonths,
+            datasets: [
+                {
+                    label: `Sales for ${new Date().getFullYear() - 1}`,
+                    data: lastYearSales,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                },
+                {
+                    label: `Sales for ${new Date().getFullYear()}`,
+                    data: currentYearSales,
+                    borderColor: 'green',
+                    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Year-over-Year (YoY) Sales Growth'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
 </script>
 <br>
 <br>
