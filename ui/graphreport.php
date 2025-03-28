@@ -224,6 +224,19 @@ $date[]=$order_date;
   </div>
 </div>
 
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Customer Segmentation</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="customerSegmentationChart" style="height:400px;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php
 
 $select = $pdo->prepare("select product_name , sum(qty) as q from tbl_invoice_details where order_date between :fromdate AND :todate group by product_id");
@@ -361,6 +374,32 @@ foreach ($yoyData as $year => $data) {
       $currentYearSales[] = $sales;
     }
   }
+}
+?>
+<?php
+// Fetch customer segmentation data
+$selectCustomerSegmentation = $pdo->prepare("
+  SELECT name, phone, COUNT(tbl_invoice.invoice_id) AS purchase_count, SUM(tbl_invoice.total) AS total_spent
+  FROM tbl_customer
+  JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id
+  WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate
+  GROUP BY tbl_customer.customer_id
+  ORDER BY total_spent DESC
+");
+$selectCustomerSegmentation->bindParam(':fromdate', $_POST['date_1']);
+$selectCustomerSegmentation->bindParam(':todate', $_POST['date_2']);
+$selectCustomerSegmentation->execute();
+
+$customerNames = [];
+$customerPhones = [];
+$purchaseCounts = [];
+$totalSpent = [];
+
+while ($row = $selectCustomerSegmentation->fetch(PDO::FETCH_ASSOC)) {
+  $customerNames[] = $row['name'];
+  $customerPhones[] = $row['phone'];
+  $purchaseCounts[] = $row['purchase_count'];
+  $totalSpent[] = $row['total_spent'];
 }
 ?>
 
@@ -666,6 +705,53 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctxCustomerSegmentation = document.getElementById('customerSegmentationChart').getContext('2d');
+
+    const customerNames = <?php echo json_encode($customerNames); ?>;
+    const totalSpent = <?php echo json_encode($totalSpent); ?>;
+
+    // Function to generate distinct colors dynamically
+    function generateColor(index, total) {
+      const hue = (index * (360 / total)) % 360; // Spread colors across the hue spectrum
+      return `hsl(${hue}, 70%, 50%)`; // Keeps colors bright and distinguishable
+    }
+
+    // Generate colors for all customers
+    const dynamicColors = customerNames.map((_, index) => generateColor(index, customerNames.length));
+
+    new Chart(ctxCustomerSegmentation, {
+      type: 'bar',
+      data: {
+        labels: customerNames, // Customer names as labels
+        datasets: [
+          {
+            label: 'Total Spent ($)',
+            data: totalSpent,
+            backgroundColor: dynamicColors.map(color => color.replace(')', ', 0.6)')).map(color => color.replace('hsl', 'hsla')), // Add transparency
+            borderColor: dynamicColors, // Keep borders solid
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right'
+          },
+          title: {
+            display: true,
+            text: 'Customer Segmentation (Total Spent)'
+          }
+        }
+      }
+    });
+  });
+</script>
+
+
 <br>
 <br>
 <hr>
