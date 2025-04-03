@@ -384,24 +384,27 @@ $row = $select->fetch(PDO::FETCH_OBJ);
 
                     <hr style="height:2px; border-width:0; color:black; background-color:black;">
 
-                    <div class="icheck-success d-inline">
-                      <input type="radio" name="rb" value="Cash" checked id="radioSuccess1">
-                      <label for="radioSuccess1">
-                        CASH
-                      </label>
+                    <div style="display: flex; align-items: center;">
+                      <div class="icheck-success d-inline" >
+                        <input type="radio" name="rb" value="Cash" checked id="radioSuccess1">
+                        <label for="radioSuccess1">CASH</label>
+                      </div>
+                      <div class="icheck-primary d-inline" style=" margin-left: 10px;">
+                        <input type="radio" name="rb" value="Card" id="radioSuccess2">
+                        <label for="radioSuccess2">CARD</label>
+                      </div>
+                      <div class="icheck-danger d-inline" style=" margin-left: 10px;">
+                        <input type="radio" name="rb" value="UPI" id="radioSuccess3">
+                        <label for="radioSuccess3">UPI</label>
+                      </div>
+                      <div style="margin-left: auto; margin-right: 20px;">
+                        <div class="icheck-danger d-inline">
+                          <input type="radio" name="rb" value="CREDIT" id="radioSuccess4">
+                          <label for="radioSuccess4">CREDIT</label>
+                        </div>
+                      </div>
                     </div>
-                    <div class="icheck-primary d-inline">
-                      <input type="radio" name="rb" value="Card" id="radioSuccess2">
-                      <label for="radioSuccess2">
-                        CARD
-                      </label>
-                    </div>
-                    <div class="icheck-danger d-inline">
-                      <input type="radio" name="rb" value="UPI" id="radioSuccess3">
-                      <label for="radioSuccess3">
-                        UPI
-                      </label>
-                    </div>
+
                     <hr style="height:2px; border-width:0; color:black; background-color:black;">
 
 
