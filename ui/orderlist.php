@@ -63,6 +63,7 @@ if($_SESSION['useremail']==""  OR $_SESSION['role']==""){
                     <td>Total</td>
                     <td>Paid</td>
                     <td>Due</td>
+                    <td>Repayment</td>
                     <td>Payment Type</td>
                   
                     <td>ActionIcons</td>
@@ -88,7 +89,8 @@ if($_SESSION['useremail']==""  OR $_SESSION['role']==""){
 <td>' . $row->order_date   . '</td>
 <td>' . $row->total        . '</td>
 <td>' . $row->paid         . '</td>
-<td>' . $row->due          . '</td>';
+<td>' . $row->due          . '</td>
+<td>' . $row->repay        . '</td>';
 
 
 

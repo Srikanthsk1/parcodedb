@@ -507,6 +507,7 @@ include_once "footer.php";
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
+
 <script>
 
   //Initialize Select2 Elements
@@ -928,7 +929,7 @@ $(document).ready(function() {
     var totalDueDiv = $('#totalDueDiv');
     var repayDiv = $('#repayDiv');
 
-    if (selectedPayment === 'Card' || selectedPayment === 'UPI') {
+    if (selectedPayment === 'Card' || selectedPayment === 'UPI' ) {
       dueInput.closest('.input-group').hide();
       totalDueDiv.hide();
       repayDiv.hide();
@@ -943,7 +944,7 @@ $(document).ready(function() {
       paidInput.prop('readonly', false);  // Enable the paid field
       calculate($("#txtdiscount_p").val(), 0);
     } else if (selectedPayment === 'Cash') {
-      dueInput.closest('.input-group').show();
+      dueInput.closest('.input-group').hide();
       totalDueDiv.hide();
       repayDiv.show();
       paidInput.val('');
@@ -1002,4 +1003,6 @@ $(document).ready(function() {
     }
   });
 });
+   
+  
 </script>
