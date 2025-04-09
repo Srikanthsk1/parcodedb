@@ -134,6 +134,8 @@ INSERT INTO `tbl_customer` (`customer_id`, `name`, `gender`, `dob`, `age`, `phon
 --
 -- Table structure for table `tbl_invoice`
 --
+
+-- Table structure for table `tbl_invoice`
 CREATE TABLE `tbl_invoice` (
   `invoice_id` int(11) NOT NULL AUTO_INCREMENT,
   `customer_id` int(11) NOT NULL,
@@ -147,6 +149,7 @@ CREATE TABLE `tbl_invoice` (
   `due` double NOT NULL,
   `paid` double NOT NULL,
   `repay` double NOT NULL DEFAULT 0,
+  PRIMARY KEY (`invoice_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -385,8 +388,8 @@ ALTER TABLE `tbl_customer`
 --
 -- Indexes for table `tbl_invoice`
 --
-ALTER TABLE `tbl_invoice`
-  ADD PRIMARY KEY (`invoice_id`);
+-- ALTER TABLE `tbl_invoice`
+--   ADD PRIMARY KEY (`invoice_id`);
 
 --
 -- Indexes for table `tbl_invoice_details`
@@ -432,7 +435,7 @@ ALTER TABLE `tbl_customer`
 -- AUTO_INCREMENT for table `tbl_invoice`
 --
 ALTER TABLE `tbl_invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tbl_invoice_details`

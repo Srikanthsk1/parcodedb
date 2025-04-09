@@ -40,6 +40,7 @@ if (isset($_POST['btnsaveorder'])) {
   $phone = isset($_POST['txtphone']) ? $_POST['txtphone'] : '';
   $city = isset($_POST['txtcity']) ? $_POST['txtcity'] : '';
   $zip_code = isset($_POST['txtzipcode']) ? $_POST['txtzipcode'] : '';
+  $repay = isset($_POST['txtrepay']) ? $_POST['txtrepay'] : '';
 
   // Calculate age based on dob
   $dobDate = new DateTime($dob);
@@ -68,7 +69,7 @@ if (isset($_POST['btnsaveorder'])) {
   $arr_price = $_POST['price_c_arr'];
   $arr_total = $_POST['saleprice_arr'];
 
-  $insert = $pdo->prepare("INSERT INTO tbl_invoice (customer_id, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid) VALUES (:customer_id, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid)");
+  $insert = $pdo->prepare("INSERT INTO tbl_invoice (customer_id, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid, repay) VALUES (:customer_id, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid, :repay)");
   $insert->bindParam(':customer_id', $customer_id);
   $insert->bindParam(':orderdate', $orderdate);
   $insert->bindParam(':subtotal', $subtotal);
@@ -79,6 +80,7 @@ if (isset($_POST['btnsaveorder'])) {
   $insert->bindParam(':payment_type', $payment_type);
   $insert->bindParam(':due', $due);
   $insert->bindParam(':paid', $paid);
+  $insert->bindParam(':repay', $repay);
   $insert->execute();
 
   $invoice_id = $pdo->lastInsertId();
