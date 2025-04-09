@@ -47,16 +47,16 @@ if (isset($_POST['btnsaveorder'])) {
   $age = $currentDate->diff($dobDate)->y;
 
   // Insert customer data into tbl_customer
-  $insertCustomer = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone, city, zipcode, order_date) VALUES (:name, :gender, :dob, :age, :phone, :city, :zipcode, :order_date)");
-  $insertCustomer->bindParam(':name', $name);
-  $insertCustomer->bindParam(':gender', $gender);
-  $insertCustomer->bindParam(':dob', $dob);
-  $insertCustomer->bindParam(':age', $age);
-  $insertCustomer->bindParam(':phone', $phone);
-  $insertCustomer->bindParam(':city', $city);
-  $insertCustomer->bindParam(':zipcode', $zip_code);
-  $insertCustomer->bindParam(':order_date', $orderdate);
-  $insertCustomer->execute();
+  $insert = $pdo->prepare("INSERT INTO tbl_customer (name, gender, dob, age, phone, city, zipcode, order_date) VALUES (:name, :gender, :dob, :age, :phone, :city, :zipcode, :order_date)");
+  $insert->bindParam(':name', $name);
+  $insert->bindParam(':gender', $gender);
+  $insert->bindParam(':dob', $dob);
+  $insert->bindParam(':age', $age);
+  $insert->bindParam(':phone', $phone);
+  $insert->bindParam(':city', $city);
+  $insert->bindParam(':zipcode', $zip_code);
+  $insert->bindParam(':order_date', $orderdate);
+  $insert->execute();
 
   $customer_id = $pdo->lastInsertId();
 
