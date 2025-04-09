@@ -134,8 +134,9 @@ INSERT INTO `tbl_customer` (`customer_id`, `name`, `gender`, `dob`, `age`, `phon
 --
 -- Table structure for table `tbl_invoice`
 --
-
-CREATE TABLE `tbl_invoice` (
+--
+-- Table structure for table `tbl_invoice`
+--
 CREATE TABLE `tbl_invoice` (
   `invoice_id` int(11) NOT NULL AUTO_INCREMENT,
   `customer_id` int(11) NOT NULL,

@@ -407,7 +407,6 @@ $row = $select->fetch(PDO::FETCH_OBJ);
 
                     <hr style="height:2px; border-width:0; color:black; background-color:black;">
 
-
                     <div class="input-group">
                       <div class="input-group-prepend">
                         <span class="input-group-text">DUE(Rs)</span>
@@ -418,6 +417,29 @@ $row = $select->fetch(PDO::FETCH_OBJ);
                       </div>
                     </div>
 
+                    <div id="totalDueDiv" style="display:none;">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">TOTAL DUE(Rs)</span>
+                        </div>
+                        <input type="text" class="form-control" name="txttotaldue" id="txttotaldue" readonly>
+                        <div class="input-group-append">
+                          <span class="input-group-text">Rs</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="repayDiv" style="display:none;">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">REPAY(Rs)</span>
+                        </div>
+                        <input type="text" class="form-control" name="txtrepay" id="txtrepay" readonly>
+                        <div class="input-group-append">
+                          <span class="input-group-text">Rs</span>
+                        </div>
+                      </div>
+                    </div>
                     <div class="input-group">
                       <div class="input-group-prepend">
                         <span class="input-group-text">PAID(Rs)</span>
@@ -769,10 +791,12 @@ include_once "footer.php";
     total = sgst + cgst + subtotal - discount;
     due = total - paid_amt;
 
-
+    // Ensure due is never negative
+    due = Math.max(0, due);
     $("#txttotal").val(total.toFixed(2));
 
     $("#txtdue").val(due.toFixed(2));
+    $("#txttotaldue").val(due.toFixed(2));
 
   }  //end calculate function
 
@@ -890,4 +914,90 @@ include_once "footer.php";
       }
     });
   });
+</script>
+<script>
+$(document).ready(function() {
+  // Function to handle payment method change
+  function handlePaymentMethodChange() {
+    var selectedPayment = $('input[name="rb"]:checked').val();
+    var dueInput = $('#txtdue');
+    var paidInput = $('#txtpaid');
+    var totalInput = $('#txttotal');
+    var totalDueDiv = $('#totalDueDiv');
+    var repayDiv = $('#repayDiv');
+
+    if (selectedPayment === 'Card' || selectedPayment === 'UPI') {
+      dueInput.closest('.input-group').hide();
+      totalDueDiv.hide();
+      repayDiv.hide();
+      paidInput.val(totalInput.val());
+      dueInput.val('0');
+      paidInput.prop('readonly', true);  // Disable the paid field
+    } else if (selectedPayment === 'CREDIT') {
+      dueInput.closest('.input-group').show();
+      totalDueDiv.show();
+      repayDiv.hide();
+      paidInput.val('');
+      paidInput.prop('readonly', false);  // Enable the paid field
+      calculate($("#txtdiscount_p").val(), 0);
+    } else if (selectedPayment === 'Cash') {
+      dueInput.closest('.input-group').show();
+      totalDueDiv.hide();
+      repayDiv.show();
+      paidInput.val('');
+      paidInput.prop('readonly', false);  // Enable the paid field
+      calculate($("#txtdiscount_p").val(), 0);
+    } else {
+      dueInput.closest('.input-group').show();
+      totalDueDiv.hide();
+      repayDiv.hide();
+      paidInput.val('');
+      paidInput.prop('readonly', false);  // Enable the paid field
+      calculate($("#txtdiscount_p").val(), 0);
+    }
+  }
+
+  // Attach the handler to the radio button change event
+  $('input[name="rb"]').change(handlePaymentMethodChange);
+
+  // Call the handler on page load to set initial state
+  handlePaymentMethodChange();
+
+  // Update paid amount when total changes (for Card and UPI)
+  $('#txttotal').on('change', function() {
+    if ($('input[name="rb"]:checked').val() === 'Card' || $('input[name="rb"]:checked').val() === 'UPI') {
+      $('#txtpaid').val($(this).val());
+    }
+  });
+
+  // Calculate repay and due amount for Cash payment
+  $('#txtpaid').on('input', function() {
+    if ($('input[name="rb"]:checked').val() === 'Cash') {
+      var total = parseFloat($('#txttotal').val()) || 0;
+      var paid = parseFloat($(this).val()) || 0;
+      var repay = 0;
+      var due = 0;
+
+      if (paid >= total) {
+        repay = paid - total;
+        due = 0;
+      } else {
+        repay = 0;
+        due = total - paid;
+      }
+
+      // Ensure due is never negative
+      due = Math.max(0, due);
+      $('#txtrepay').val(repay.toFixed(2));
+      $('#txtdue').val(due.toFixed(2));
+    }
+  });
+
+  // Ensure repay and due are calculated when switching to Cash payment
+  $('input[name="rb"]').change(function() {
+    if ($(this).val() === 'Cash') {
+      $('#txtpaid').trigger('input');
+    }
+  });
+});
 </script>
