@@ -707,20 +707,6 @@ include_once "footer.php";
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   $("#itemtable").delegate(".qty", "keyup change", function () {
     var quantity = $(this);
     var tr = $(this).parent().parent();
@@ -943,6 +929,7 @@ $(document).ready(function() {
       paidInput.val('');
       paidInput.prop('readonly', false);  // Enable the paid field
       calculate($("#txtdiscount_p").val(), 0);
+      $('#txtrepay').val('0'); 
     } else if (selectedPayment === 'Cash') {
       dueInput.closest('.input-group').hide();
       totalDueDiv.hide();
@@ -1002,6 +989,7 @@ $(document).ready(function() {
       $('#txtpaid').trigger('input');
     }
   });
+  
 });
    
   
