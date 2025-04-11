@@ -2,32 +2,23 @@
 $data = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve the selected range (60, 90, or 120 days)
     $range = $_POST['range'];
     $days = in_array($range, ['60', '90', '120']) ? (int)$range : 60;
 
-    // Calculate the date range for the query
     $to = date('Y-m-d');
     $from = date('Y-m-d', strtotime("-$days days"));
 
-    // Escape the dates for safe shell command execution
     $from_escaped = escapeshellarg($from);
     $to_escaped = escapeshellarg($to);
 
-    // 📦 Build the command to execute the Python script with the date range
-    $cmd = "python model.py $from_escaped $to_escaped 2>&1"; // Redirect stderr to stdout
-
-    // Execute the Python script
+    $cmd = "python model.py $from_escaped $to_escaped 2>&1";
     $output = shell_exec($cmd);
 
-    // 🧪 Log raw output for debugging
     file_put_contents('python_output_log.txt', "CMD: $cmd\n\nOutput:\n$output\n\n", FILE_APPEND);
 
-    // Check if the output is empty
     if ($output === null) {
         $data = ['error' => '❌ Failed to execute the Python script.'];
     } else {
-        // Decode the JSON output from the Python script
         $decoded = json_decode($output, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             $data = $decoded;
@@ -38,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -144,7 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <script>
                 const labels = ['Total Sales', 'Next Month'];
                 const datasets = [];
-
+                const brightColors = ['#FF6B6B', '#4ECDC4', '#FF9F1C', '#7F00FF', '#00B8D9', '#36D399', '#F9A825', '#C51162', '#1DE9B6', '#FFD54F'];
+                let colorIndex = 0;
                 <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                     <?php
                         $predicted_sales_price = 0;
@@ -152,42 +143,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
                             $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
                         }
-                        $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF)); // Random color
                     ?>
                     datasets.push({
                         label: "<?= addslashes($product['product_name']) ?>",
                         data: [<?= $product['total_sales_price'] ?>, <?= $predicted_sales_price ?>],
-                        borderColor: "<?= $color ?>",
-                        backgroundColor: "<?= $color ?>66",
+                        borderColor: brightColors[colorIndex % brightColors.length],
+                        backgroundColor: brightColors[colorIndex % brightColors.length] + 'CC',
                         fill: false,
-                        tension: 0.3
+                        tension: 0.4
                     });
+                    colorIndex++;
                 <?php endforeach; ?>
-
-                const ctx = document.getElementById('multiLineChart').getContext('2d');
-                new Chart(ctx, {
+                new Chart(document.getElementById('multiLineChart'), {
                     type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: datasets
-                    },
+                    data: { labels: labels, datasets: datasets },
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: {
-                                position: 'bottom'
-                            },
+                            legend: { position: 'bottom' },
+                            tooltip: { mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Sales in RS' } }
+                        }
+                    }
+                });
+
+                // 🔥 Top 5 High Priority Products (New Chart)
+                const productForecasts = <?php echo json_encode($data['Product-wise Forecasts']); ?>;
+                const sorted = productForecasts.sort((a, b) => b.predicted_next_month - a.predicted_next_month);
+                const top5 = sorted.slice(0, 5);
+                const priorityLabels = top5.map(p => p.product_name);
+                const priorityData = top5.map(p => p.predicted_next_month);
+                const priorityColors = ['#e74c3c', '#f39c12', '#3498db', '#1abc9c', '#9b59b6'];
+
+                const priorityCtx = document.createElement('canvas');
+                priorityCtx.id = 'priorityChart';
+                document.body.insertAdjacentHTML('beforeend', '<h4>🔥 Top 5 High-Priority Products for Next Month (by Quantity)</h4><div class="chart-container"></div>');
+                document.querySelector('.chart-container:last-child').appendChild(priorityCtx);
+
+                new Chart(priorityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: priorityLabels,
+                        datasets: [{
+                            label: 'Predicted Qty (Next Month)',
+                            data: priorityData,
+                            backgroundColor: priorityColors,
+                            borderColor: priorityColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
                             tooltip: {
-                                mode: 'index',
-                                intersect: false
+                                callbacks: {
+                                    label: ctx => `${ctx.parsed.x} Units`
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '💡 Restock These First!'
                             }
                         },
                         scales: {
-                            y: {
+                            x: {
                                 beginAtZero: true,
                                 title: {
                                     display: true,
-                                    text: 'Sales in RS'
+                                    text: 'Predicted Quantity'
                                 }
                             }
                         }
