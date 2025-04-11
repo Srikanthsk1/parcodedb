@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Sales Forecast & Product Priority</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h2 { color: #333; text-align: center; }
@@ -71,6 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 5px;
         }
         .error { color: red; text-align: center; }
+        .chart-container {
+            width: 80%;
+            margin: 40px auto;
+        }
     </style>
 </head>
 <body>
@@ -124,6 +129,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <h4>📊 Monthly Sales Trend</h4>
             <img src="sales_trend.png" alt="Sales Trend Graph" width="700">
+
+            <h4>📈 Product-wise Sales: Previous vs Predicted (All in One Chart)</h4>
+            <div class="chart-container">
+                <canvas id="multiLineChart"></canvas>
+            </div>
+
+            <script>
+                const labels = ['Total sales ', 'Next Month'];
+                const datasets = [];
+
+                <?php foreach ($data['products'] as $product): ?>
+                    <?php
+                        $predicted_sales_price = 0;
+                        if ($product['total_sold_quantity'] > 0) {
+                            $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
+                            $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
+                        }
+                        $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF)); // Random color
+                    ?>
+                    datasets.push({
+                        label: "<?= addslashes($product['product_name']) ?>",
+                        data: [<?= $product['total_sales_price'] ?>, <?= $predicted_sales_price ?>],
+                        borderColor: "<?= $color ?>",
+                        backgroundColor: "<?= $color ?>66",
+                        fill: false,
+                        tension: 0.3
+                    });
+                <?php endforeach; ?>
+
+                const ctx = document.getElementById('multiLineChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Sales in RS'
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
         <?php endif; ?>
     <?php endif; ?>
 </body>
