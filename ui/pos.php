@@ -83,6 +83,15 @@ if (isset($_POST['btnsaveorder'])) {
   $insert->bindParam(':repay', $repay);
   $insert->execute();
 
+  $insert = $pdo->prepare("INSERT INTO sales (phone, paid, repay, due, customer_id) 
+                         VALUES (:phone, :paid, :repay, :due, :customer_id)");
+$insert->bindParam(':phone', $phone);
+$insert->bindParam(':paid', $paid);
+$insert->bindParam(':repay', $repay);
+$insert->bindParam(':due', $due);
+$insert->bindParam(':customer_id', $customer_id);
+$insert->execute();
+
   $invoice_id = $pdo->lastInsertId();
   if ($invoice_id != null) {
     for ($i = 0; $i < count($arr_pid); $i++) {
@@ -387,7 +396,7 @@ $row = $select->fetch(PDO::FETCH_OBJ);
                     <hr style="height:2px; border-width:0; color:black; background-color:black;">
 
                     <div style="display: flex; align-items: center;">
-                      <div class="icheck-success d-inline" >
+                      <div class="icheck-success d-inline">
                         <input type="radio" name="rb" value="Cash" checked id="radioSuccess1">
                         <label for="radioSuccess1">CASH</label>
                       </div>
@@ -530,15 +539,48 @@ include_once "footer.php";
     }
   });
 
+  // Add event listener to the "PAID" input field
+  $('#txtpaid').on('input', function () {
+    calculateTotalDue();
+  });
 
+  // Function to calculate total due
+  function calculateTotalDue() {
+    var total = parseFloat($('#txttotal').val());
+    var paid = parseFloat($('#txtpaid').val());
+    var phoneNumber = $('#txtphone').val(); // Assuming you have an input field for phone number
 
+    // Make an AJAX request to retrieve previous dues for the customer
+    $.ajax({
+      url: 'getdue.php', // Replace with the actual PHP file to retrieve previous dues
+      type: 'POST',
+      data: { phone: phoneNumber }, // Use the phone number instead of customerId
+      success: function (response) {
+        var previousDues = parseFloat(response);
 
+        if (isNaN(total) || isNaN(paid) || isNaN(previousDues)) {
+          return;
+        }
 
+        var due = total - paid + previousDues;
 
-
-
-
-
+        if (due < 0) {
+          $('#txtdue').val(0);
+          $('#totalDueDiv').hide();
+          $('#repayDiv').show();
+          $('#txtrepay').val(Math.abs(due));
+        } else {
+          $('#txtdue').val(due);
+          $('#totalDueDiv').show();
+          $('#repayDiv').hide();
+          $('#txtrepay').val('');
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error('Error:', error);
+      }
+    });
+  }
 
   var productarr = [];
 
@@ -738,14 +780,14 @@ include_once "footer.php";
     }
   });
 
-  function calculate(dis, paid) {
+  function calculate(discount, customerId) {
 
     var subtotal = 0;
     var discount = dis;
     var sgst = 0;
     var cgst = 0;
     var total = 0;
-    var paid_amt = paid;
+    var paid_amt = 0;
     var due = 0;
 
     $(".saleprice").each(function () {
@@ -776,7 +818,6 @@ include_once "footer.php";
 
     $("#txtdiscount_n").val(discount.toFixed(2));
 
-
     total = sgst + cgst + subtotal - discount;
     due = total - paid_amt;
 
@@ -787,6 +828,36 @@ include_once "footer.php";
     $("#txtdue").val(due.toFixed(2));
     $("#txttotaldue").val(due.toFixed(2));
 
+    // Make an AJAX request to retrieve previous dues for the customer
+    $.ajax({
+      url: 'getdue.php', // Replace with the actual PHP file to retrieve previous dues
+      type: 'POST',
+      data: { phone: customerId }, // Use the phone number instead of customerId
+      success: function (response) {
+        var previousDues = parseFloat(response);
+
+        if (isNaN(total) || isNaN(paid_amt) || isNaN(previousDues)) {
+          return;
+        }
+
+        var due = total - paid_amt + previousDues;
+
+        if (due < 0) {
+          $('#txtdue').val(0);
+          $('#totalDueDiv').hide();
+          $('#repayDiv').show();
+          $('#txtrepay').val(Math.abs(due));
+        } else {
+          $('#txtdue').val(due);
+          $('#totalDueDiv').show();
+          $('#repayDiv').hide();
+          $('#txtrepay').val('');
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error('Error:', error);
+      }
+    });
   }  //end calculate function
 
 
@@ -905,92 +976,92 @@ include_once "footer.php";
   });
 </script>
 <script>
-$(document).ready(function() {
-  // Function to handle payment method change
-  function handlePaymentMethodChange() {
-    var selectedPayment = $('input[name="rb"]:checked').val();
-    var dueInput = $('#txtdue');
-    var paidInput = $('#txtpaid');
-    var totalInput = $('#txttotal');
-    var totalDueDiv = $('#totalDueDiv');
-    var repayDiv = $('#repayDiv');
+  $(document).ready(function () {
+    // Function to handle payment method change
+    function handlePaymentMethodChange() {
+      var selectedPayment = $('input[name="rb"]:checked').val();
+      var dueInput = $('#txtdue');
+      var paidInput = $('#txtpaid');
+      var totalInput = $('#txttotal');
+      var totalDueDiv = $('#totalDueDiv');
+      var repayDiv = $('#repayDiv');
 
-    if (selectedPayment === 'Card' || selectedPayment === 'UPI' ) {
-      dueInput.closest('.input-group').hide();
-      totalDueDiv.hide();
-      repayDiv.hide();
-      paidInput.val(totalInput.val());
-      dueInput.val('0');
-      paidInput.prop('readonly', true);  // Disable the paid field
-    } else if (selectedPayment === 'CREDIT') {
-      dueInput.closest('.input-group').show();
-      totalDueDiv.show();
-      repayDiv.hide();
-      paidInput.val('');
-      paidInput.prop('readonly', false);  // Enable the paid field
-      calculate($("#txtdiscount_p").val(), 0);
-      $('#txtrepay').val('0'); 
-    } else if (selectedPayment === 'Cash') {
-      dueInput.closest('.input-group').hide();
-      totalDueDiv.hide();
-      repayDiv.show();
-      paidInput.val('');
-      paidInput.prop('readonly', false);  // Enable the paid field
-      calculate($("#txtdiscount_p").val(), 0);
-    } else {
-      dueInput.closest('.input-group').show();
-      totalDueDiv.hide();
-      repayDiv.hide();
-      paidInput.val('');
-      paidInput.prop('readonly', false);  // Enable the paid field
-      calculate($("#txtdiscount_p").val(), 0);
-    }
-  }
-
-  // Attach the handler to the radio button change event
-  $('input[name="rb"]').change(handlePaymentMethodChange);
-
-  // Call the handler on page load to set initial state
-  handlePaymentMethodChange();
-
-  // Update paid amount when total changes (for Card and UPI)
-  $('#txttotal').on('change', function() {
-    if ($('input[name="rb"]:checked').val() === 'Card' || $('input[name="rb"]:checked').val() === 'UPI') {
-      $('#txtpaid').val($(this).val());
-    }
-  });
-
-  // Calculate repay and due amount for Cash payment
-  $('#txtpaid').on('input', function() {
-    if ($('input[name="rb"]:checked').val() === 'Cash') {
-      var total = parseFloat($('#txttotal').val()) || 0;
-      var paid = parseFloat($(this).val()) || 0;
-      var repay = 0;
-      var due = 0;
-
-      if (paid >= total) {
-        repay = paid - total;
-        due = 0;
+      if (selectedPayment === 'Card' || selectedPayment === 'UPI') {
+        dueInput.closest('.input-group').hide();
+        totalDueDiv.hide();
+        repayDiv.hide();
+        paidInput.val(totalInput.val());
+        dueInput.val('0');
+        paidInput.prop('readonly', true);  // Disable the paid field
+      } else if (selectedPayment === 'CREDIT') {
+        dueInput.closest('.input-group').show();
+        totalDueDiv.show();
+        repayDiv.hide();
+        paidInput.val('');
+        paidInput.prop('readonly', false);  // Enable the paid field
+        calculate($("#txtdiscount_p").val(), 0);
+        $('#txtrepay').val('0');
+      } else if (selectedPayment === 'Cash') {
+        dueInput.closest('.input-group').hide();
+        totalDueDiv.hide();
+        repayDiv.show();
+        paidInput.val('');
+        paidInput.prop('readonly', false);  // Enable the paid field
+        calculate($("#txtdiscount_p").val(), 0);
       } else {
-        repay = 0;
-        due = total - paid;
+        dueInput.closest('.input-group').show();
+        totalDueDiv.hide();
+        repayDiv.hide();
+        paidInput.val('');
+        paidInput.prop('readonly', false);  // Enable the paid field
+        calculate($("#txtdiscount_p").val(), 0);
       }
-
-      // Ensure due is never negative
-      due = Math.max(0, due);
-      $('#txtrepay').val(repay.toFixed(2));
-      $('#txtdue').val(due.toFixed(2));
     }
+
+    // Attach the handler to the radio button change event
+    $('input[name="rb"]').change(handlePaymentMethodChange);
+
+    // Call the handler on page load to set initial state
+    handlePaymentMethodChange();
+
+    // Update paid amount when total changes (for Card and UPI)
+    $('#txttotal').on('change', function () {
+      if ($('input[name="rb"]:checked').val() === 'Card' || $('input[name="rb"]:checked').val() === 'UPI') {
+        $('#txtpaid').val($(this).val());
+      }
+    });
+
+    // Calculate repay and due amount for Cash payment
+    $('#txtpaid').on('input', function () {
+      if ($('input[name="rb"]:checked').val() === 'Cash') {
+        var total = parseFloat($('#txttotal').val()) || 0;
+        var paid = parseFloat($(this).val()) || 0;
+        var repay = 0;
+        var due = 0;
+
+        if (paid >= total) {
+          repay = paid - total;
+          due = 0;
+        } else {
+          repay = 0;
+          due = total - paid;
+        }
+
+        // Ensure due is never negative
+        due = Math.max(0, due);
+        $('#txtrepay').val(repay.toFixed(2));
+        $('#txtdue').val(due.toFixed(2));
+      }
+    });
+
+    // Ensure repay and due are calculated when switching to Cash payment
+    $('input[name="rb"]').change(function () {
+      if ($(this).val() === 'Cash') {
+        $('#txtpaid').trigger('input');
+      }
+    });
+
   });
 
-  // Ensure repay and due are calculated when switching to Cash payment
-  $('input[name="rb"]').change(function() {
-    if ($(this).val() === 'Cash') {
-      $('#txtpaid').trigger('input');
-    }
-  });
-  
-});
-   
-  
+
 </script>
