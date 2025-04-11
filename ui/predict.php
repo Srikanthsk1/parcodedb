@@ -35,44 +35,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Sales Forecast & Product Priority</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { color: #333; text-align: center; }
-        form { margin-bottom: 20px; text-align: center; }
-        label { margin: 0 10px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f3f4f7, #e3ecf7);
+            margin: 0;
+            padding: 0;
+        }
+
+        h2, h3, h4 {
+            text-align: center;
+            color: #333;
+            animation: fadeIn 1.5s ease;
+        }
+
+        form {
+            margin: 40px auto 20px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 60%;
+            animation: slideInTop 1s ease;
+        }
+
+        label {
+            margin: 0 15px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
         input[type="submit"] {
-            padding: 10px 20px;
+            padding: 10px 30px;
+            margin-top: 20px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 20px;
+            transition: background 0.3s;
         }
-        h3, h4 { margin-top: 20px; text-align: center; }
+
+        input[type="submit"]:hover {
+            background-color: #388E3C;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px auto;
+            width: 85%;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            animation: shake 0.4s ease;
+        }
+
         table {
             border-collapse: collapse;
-            width: 80%;
+            width: 90%;
             margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: fadeIn 1.2s ease;
         }
+
         th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
+            padding: 14px 12px;
             text-align: center;
         }
-        th { background-color: #f2f2f2; }
+
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        tr:hover {
+            background: #d7f0db;
+            transition: background 0.3s ease;
+        }
+
         img {
             display: block;
             margin: 30px auto;
-            border: 1px solid #ddd;
-            padding: 5px;
+            max-width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .error { color: red; text-align: center; }
+
         .chart-container {
-            width: 80%;
+            width: 85%;
             margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 1.3s ease;
         }
+
+        canvas {
+            margin-top: 15px;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes slideInTop {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
+        }
+        
     </style>
 </head>
+
 <body>
     <h2>Sales Forecasting & Product Analysis</h2>
     <form method="post">
