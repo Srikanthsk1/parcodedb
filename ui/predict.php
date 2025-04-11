@@ -2,16 +2,19 @@
 $data = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve the selected range (60, 90, or 120 days)
     $range = $_POST['range'];
     $days = in_array($range, ['60', '90', '120']) ? (int)$range : 60;
 
+    // Calculate the date range for the query
     $to = date('Y-m-d');
     $from = date('Y-m-d', strtotime("-$days days"));
 
+    // Escape the dates for safe shell command execution
     $from_escaped = escapeshellarg($from);
     $to_escaped = escapeshellarg($to);
 
-    // 📦 Build the command
+    // 📦 Build the command to execute the Python script with the date range
     $cmd = "python model.py $from_escaped $to_escaped 2>&1"; // Redirect stderr to stdout
 
     // Execute the Python script
@@ -20,9 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 🧪 Log raw output for debugging
     file_put_contents('python_output_log.txt', "CMD: $cmd\n\nOutput:\n$output\n\n", FILE_APPEND);
 
+    // Check if the output is empty
     if ($output === null) {
         $data = ['error' => '❌ Failed to execute the Python script.'];
     } else {
+        // Decode the JSON output from the Python script
         $decoded = json_decode($output, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             $data = $decoded;
@@ -91,9 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (isset($data['error'])): ?>
             <h3 class="error">Error: <?= htmlspecialchars($data['error']) ?></h3>
         <?php else: ?>
-            <h3>📈 Overall Sales: <?= htmlspecialchars($data['total_sales']) ?> USD</h3>
-            <h3>📈 Predicted Overall Sales for Next Month: <?= htmlspecialchars($data['predicted_next_month_sales']) ?> USD</h3>
-
+            <h3>📈 Overall Sales: <?= htmlspecialchars($data['Overall Sales Summary']['Total Revenue in Selected Range']) ?> RS</h3>
+            <h3>📈 Predicted Overall Sales for Next Month: <?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Revenue)']) ?> RS</h3>
+            <h3>📈 Overall Quantity: <?= htmlspecialchars($data['Overall Sales Summary']['Total Sales in Selected Range']) ?> (Quantity)</h3>
+            <h3>📈 Predicted Overall Quantity for Next Month: <?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?> (Quantity)</h3>
             <h4>📦 Product-wise Forecast, Total Sold, and Sales Price</h4>
             <table>
                 <thead>
@@ -107,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($data['products'] as $product): ?>
+                    <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                         <?php
                             $predicted_sales_price = 0;
                             if ($product['total_sold_quantity'] > 0) {
@@ -136,10 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <script>
-                const labels = ['Total sales ', 'Next Month'];
+                const labels = ['Total Sales', 'Next Month'];
                 const datasets = [];
 
-                <?php foreach ($data['products'] as $product): ?>
+                <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                     <?php
                         $predicted_sales_price = 0;
                         if ($product['total_sold_quantity'] > 0) {

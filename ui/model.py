@@ -69,17 +69,16 @@ def product_level_forecasting(df):
     for (product_id, product_name), group in df.groupby(['product_id', 'product_name']):
         temp = group.copy()
         temp['sales_price'] = temp['quantity'] * temp['price']
-        
+
         monthly = temp.groupby('month').agg({
             'quantity': 'sum',
             'sales_price': 'sum'
         }).reset_index()
-        
+
         monthly['month'] = monthly['month'].astype(str)
         monthly['month_num'] = range(len(monthly))
         monthly_all.append(monthly.assign(product_id=product_id, product_name=product_name))
 
-        # Forecasting
         if len(monthly) >= 3:
             model = RandomForestRegressor(n_estimators=100, random_state=42)
             model.fit(monthly[['month_num']], monthly['quantity'])
@@ -111,21 +110,25 @@ def overall_forecasting(df):
     monthly['month'] = monthly['sale_date'].astype(str)
     monthly['month_num'] = range(len(monthly))
 
+    total_quantity = df['quantity'].sum()
+    total_sales = df['sales_price'].sum()
+    avg_price_per_unit = total_sales / total_quantity if total_quantity else 0
+
     if len(monthly) >= 3:
         model = RandomForestRegressor(n_estimators=100, random_state=42)
         model.fit(monthly[['month_num']], monthly['quantity'])
         next_month = pd.DataFrame([[monthly['month_num'].max() + 1]], columns=['month_num'])
-        prediction = model.predict(next_month)[0]
+        predicted_quantity = model.predict(next_month)[0]
     else:
-        prediction = monthly['quantity'].mean()
+        predicted_quantity = monthly['quantity'].mean()
 
-    total_sold_quantity = df['quantity'].sum()
-    total_sales_price = df['sales_price'].sum()
+    predicted_sales_value = predicted_quantity * avg_price_per_unit
 
     return {
-        'total_sold_quantity': int(total_sold_quantity),
-        'total_sales_price': round(float(total_sales_price), 2),
-        'predicted_next_month': round(float(prediction), 2)
+        'total_sold_quantity': int(total_quantity),
+        'total_sales_price': round(float(total_sales), 2),
+        'predicted_next_month_quantity': round(float(predicted_quantity), 2),
+        'predicted_next_month_sales': round(float(predicted_sales_value), 2)
     }, monthly
 
 def visualize(monthly_all_df, overall_monthly, overall_pred):
@@ -135,7 +138,7 @@ def visualize(monthly_all_df, overall_monthly, overall_pred):
         sub = monthly_all_df[monthly_all_df['product_id'] == product_id]
         sns.lineplot(x='month', y='quantity', data=sub, label=sub['product_name'].iloc[0], marker='o')
 
-    plt.axhline(overall_pred['predicted_next_month'], color='red', linestyle='--', label='Predicted Next Month')
+    plt.axhline(overall_pred['predicted_next_month_quantity'], color='red', linestyle='--', label='Predicted Next Month')
     plt.title('Sales Trends by Product and Overall')
     plt.xticks(rotation=45)
     plt.tight_layout()
@@ -155,15 +158,17 @@ def main(from_date, to_date):
             visualize(monthly_all, overall_monthly, overall_result)
 
             output = {
-                'total_sales': overall_result['total_sold_quantity'],
-                'predicted_next_month_sales': overall_result['predicted_next_month'],
-                'products': product_forecasts
+                "Overall Sales Summary": {
+                    "Total Sales in Selected Range": overall_result['total_sold_quantity'],
+                    "Total Revenue in Selected Range": overall_result['total_sales_price'],
+                    "Predicted Overall Sales for Next Month (Qty)": overall_result['predicted_next_month_quantity'],
+                    "Predicted Overall Sales for Next Month (Revenue)": overall_result['predicted_next_month_sales']
+                },
+                "Product-wise Forecasts": product_forecasts
             }
 
-        # ✅ Ensure JSON-serializability
         sys.stdout.write(json.dumps(convert_numpy_types(output)))
-        
-        # Log received data
+
         with open("python_debug_log.txt", "a") as f:
             f.write(f"Received FROM: {from_date}, TO: {to_date}\n")
 
