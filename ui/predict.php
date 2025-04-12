@@ -236,6 +236,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <br>
 
 
+            <h4>📈Product-wise Forecast, Total Sold, and Sales Price </h4>
+            <div class="chart-container">
+                <img src="sales_trend.png" alt="Sales Chart">
+            </div>
             <h4>📈 Product-wise Sales: Previous vs Predicted</h4>
             <div class="chart-container">
                 <canvas id="multiLineChart"></canvas>
@@ -329,5 +333,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </script>
         <?php endif; ?>
     <?php endif; ?>
+   
 </body>
 </html>
