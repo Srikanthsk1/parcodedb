@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.07);
             text-align: center;
-            width: 220px;
+            width: 250px;
             transition: transform 0.3s;
         }
         .metric-card:hover {
@@ -197,6 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?> Units</p>
                 </div>
             </section>
+            <br>
+            <br>
 
             <h4>📦 Product-wise Forecast, Total Sold, and Sales Price</h4>
             <table>
@@ -230,6 +232,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <br>
+            <br>
+
 
             <h4>📈 Product-wise Sales: Previous vs Predicted</h4>
             <div class="chart-container">
@@ -287,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 const canvas = document.createElement('canvas');
                 canvas.id = 'priorityChart';
-                document.body.insertAdjacentHTML('beforeend', '<h4>🔥 Top 5 Priority Products</h4><div class="chart-container"></div>');
+                document.body.insertAdjacentHTML('beforeend', '<br><br><h4>🔥 Top 5 Priority Products</h4><div class="chart-container"></div>');
                 document.querySelector('.chart-container:last-child').appendChild(canvas);
 
                 new Chart(canvas, {
