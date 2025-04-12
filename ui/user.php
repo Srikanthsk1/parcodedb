@@ -1,4 +1,12 @@
-
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overscroll-behavior: none;  
+        touch-action: none; 
+    }
+</style>
 
 <?php
 

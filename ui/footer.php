@@ -1,4 +1,13 @@
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overscroll-behavior: none;  
+        touch-action: none;
 
+    }
+</style>
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->

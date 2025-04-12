@@ -1,3 +1,13 @@
+
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overscroll-behavior: none;  
+        touch-action: none; 
+    }
+</style>
 <?php
 error_reporting(0);
 include_once 'connectdb.php';

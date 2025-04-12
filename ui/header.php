@@ -1,3 +1,12 @@
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overscroll-behavior: none;  
+        touch-action: none; 
+    }
+</style>
 <!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from

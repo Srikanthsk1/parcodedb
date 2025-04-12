@@ -1,3 +1,12 @@
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overscroll-behavior: none;  
+        touch-action: none; 
+    }
+</style>
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
