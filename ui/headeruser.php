@@ -77,7 +77,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       
           <li class="nav-item">
             <a href="pos.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-book"></i>
               <p>
                 POS
                 
@@ -87,7 +87,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
           <li class="nav-item">
             <a href="orderlist.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-list"></i>
               <p>
                 Order List
                 
@@ -96,7 +96,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </li>
           <li class="nav-item">
             <a href="category.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-table"></i>
               <p>
                 Category
                 
@@ -133,7 +133,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <ul class="nav nav-treeview">
               <li class="nav-item">
               <a href="graphreport.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="far fa-circle nav-icon"></i>
                 <p>
                 Graph Report
                 </p>
@@ -141,13 +141,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </li>
               <li class="nav-item">
               <a href="tablereport.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="far fa-circle nav-icon"></i>
                 <p>
                 Table Report
                 </p>
               </a>
               </li>
             </ul>
+          </li>
+          <li class="nav-item">
+            <a href="predict.php" class="nav-link">
+            <i class="nav-icon fas fa-chart-bar"></i>
+              <p>
+             Predict
+              
+              </p>
+            </a>
           </li>
 
        

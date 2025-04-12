@@ -146,7 +146,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </li>
           <li class="nav-item">
             <a href="predict.php" class="nav-link">
-            <i class="nav-icon fas fa-list"></i>
+            <i class="nav-icon fas fa-chart-bar"></i>
               <p>
              Predict
               
