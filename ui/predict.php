@@ -3,7 +3,7 @@
         margin: 0;
         padding: 0;
         overflow-x: hidden;
-        overscroll-behavior: none;  
+        overscroll-behavior: none;
         /* touch-action: none;  */
     }
 </style>
@@ -13,7 +13,7 @@ $data = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $range = $_POST['range'];
-    $days = in_array($range, ['60', '90', '120']) ? (int)$range : 60;
+    $days = in_array($range, ['60', '90', '120']) ? (int) $range : 60;
 
     $to = date('Y-m-d');
     $from = date('Y-m-d', strtotime("-$days days"));
@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>📊 Sales Forecast Dashboard</title>
@@ -50,39 +51,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         * {
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             background: #f4f7fa;
             color: #333;
         }
+
         header {
             background: #1e293b;
             padding: 25px 0;
             color: white;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             margin: 0;
             font-size: 28px;
         }
+
         .form-section {
             text-align: center;
             margin: 40px auto;
         }
+
         .form-box {
             background: white;
             padding: 20px 30px;
             border-radius: 15px;
             display: inline-block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
+
         .form-box label {
             margin: 0 15px;
             font-weight: 500;
             font-size: 16px;
         }
+
         .form-box input[type="submit"] {
             margin-left: 20px;
             padding: 10px 24px;
@@ -93,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             cursor: pointer;
         }
+
         .metrics {
             display: flex;
             flex-wrap: wrap;
@@ -101,28 +110,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 30px auto;
             width: 90%;
         }
+
         .metric-card {
             background: white;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
             text-align: center;
             width: 250px;
             transition: transform 0.3s;
         }
+
         .metric-card:hover {
             transform: translateY(-4px);
         }
+
         .metric-card h3 {
             margin-bottom: 10px;
             font-size: 18px;
             color: #555;
         }
+
         .metric-card p {
             font-size: 22px;
             font-weight: 600;
             color: #111;
         }
+
         table {
             width: 95%;
             margin: 30px auto;
@@ -130,50 +144,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-        th, td {
+
+        th,
+        td {
             padding: 14px;
             text-align: center;
         }
+
         th {
             background: #3b82f6;
             color: white;
         }
+
         tr:nth-child(even) {
             background: #f9fafb;
         }
+
         tr:hover {
             background: #e0f2fe;
         }
+
         .chart-container {
             width: 90%;
             margin: 40px auto;
             background: white;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
+
         canvas {
             margin-top: 15px;
         }
+
         .error {
             text-align: center;
             color: red;
             font-weight: bold;
             margin-top: 20px;
         }
+
         h4 {
             text-align: center;
             margin-top: 40px;
             font-size: 20px;
             color: #333;
         }
+
+        .dashboard-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* Make sure it stays on top */
+}
+
+.dashboard-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
     </style>
 </head>
+
 <body>
     <header>
-        <h1>📊 Prediction Dashboard</h1>
+        <h1>📊 Prediction Dashboard  </h1><div class="dashboard-container"><a href="dashboard.php" class="dashboard-btn">Dashboard</a></div>
     </header>
 
     <section class="form-section">
@@ -196,7 +245,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="metric-card">
                     <h3>Predicted Revenue</h3>
-                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Revenue)']) ?> RS</p>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Revenue)']) ?>
+                        RS</p>
                 </div>
                 <div class="metric-card">
                     <h3>Total Quantity</h3>
@@ -204,7 +254,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="metric-card">
                     <h3>Predicted Quantity</h3>
-                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?> Units</p>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?>
+                        Units</p>
                 </div>
             </section>
             <br>
@@ -225,11 +276,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <tbody>
                     <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                         <?php
-                            $predicted_sales_price = 0;
-                            if ($product['total_sold_quantity'] > 0) {
-                                $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
-                                $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
-                            }
+                        $predicted_sales_price = 0;
+                        if ($product['total_sold_quantity'] > 0) {
+                            $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
+                            $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
+                        }
                         ?>
                         <tr>
                             <td><?= htmlspecialchars($product['product_id']) ?></td>
@@ -263,11 +314,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                     <?php
-                        $predicted_sales_price = 0;
-                        if ($product['total_sold_quantity'] > 0) {
-                            $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
-                            $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
-                        }
+                    $predicted_sales_price = 0;
+                    if ($product['total_sold_quantity'] > 0) {
+                        $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
+                        $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
+                    }
                     ?>
                     datasets.push({
                         label: "<?= addslashes($product['product_name']) ?>",
@@ -343,6 +394,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </script>
         <?php endif; ?>
     <?php endif; ?>
-   
+    
+
+
 </body>
+
 </html>
