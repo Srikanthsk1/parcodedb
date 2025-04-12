@@ -3,6 +3,7 @@
 error_reporting(0);
 include_once 'connectdb.php';
 session_start();
+
 if ($_SESSION['useremail'] == "") {
     header('location:../index.php');
 }
@@ -102,29 +103,38 @@ if ($_SESSION['role'] == "Admin") {
                       <div class="card-header">
                         <h3 class="card-title">Total Earnings</h3>
                       </div>
-                      <div class="card-body">
-                        <canvas id="myChart" style="height:500px;"></canvas>
+                      <div class="card-body" style="position: relative; height: 400px;">
+                        <canvas id="myChart"></canvas>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                <style>
+                  #myChart {
+                    width: 100% !important;
+                    height: 100% !important;
+                  }
+                </style>
+
                 <script>
-                  const ctx = document.getElementById('myChart');
+                  const ctx = document.getElementById('myChart').getContext('2d');
 
                   new Chart(ctx, {
                     type: 'bar',
                     data: {
-                      labels: <?php echo json_encode($date); ?>,
+                      labels: <?php echo json_encode($date ?? []); ?>,
                       datasets: [{
                         label: 'Total Earning',
                         backgroundColor: 'rgb(255,99,132)',
                         borderColor: 'rgb(255,99,132)',
-                        data: <?php echo json_encode($total); ?>,
+                        data: <?php echo json_encode($total ?? []); ?>,
                         borderWidth: 1
                       }]
                     },
                     options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
                       scales: {
                         y: {
                           beginAtZero: true
@@ -145,10 +155,10 @@ if ($_SESSION['role'] == "Admin") {
 
 <?php include_once "footer.php"; ?>
 
-<!-- InputMask -->
+<!-- Moment JS -->
 <script src="../plugins/moment/moment.min.js"></script>
 
-<!-- date-range-picker -->
+<!-- Date Range Picker -->
 <script src="../plugins/daterangepicker/daterangepicker.js"></script>
 
 <!-- Tempusdominus Bootstrap 4 -->
@@ -160,7 +170,6 @@ if ($_SESSION['role'] == "Admin") {
     format: 'YYYY-MM-DD'
   });
 
-  //Date picker
   $('#date_2').datetimepicker({
     format: 'YYYY-MM-DD'
   });
