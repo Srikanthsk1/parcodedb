@@ -4,7 +4,7 @@
         padding: 0;
         overflow-x: hidden;
         overscroll-behavior: none;  
-        touch-action: none; 
+        /* touch-action: none;  */
     }
 </style>
 <!DOCTYPE html>
