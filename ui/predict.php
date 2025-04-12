@@ -33,171 +33,171 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sales Forecast & Product Priority</title>
+    <title>📊 Sales Forecast Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f3f4f7, #e3ecf7);
             margin: 0;
-            padding: 0;
-        }
-
-        h2, h3, h4 {
-            text-align: center;
+            background: #f4f7fa;
             color: #333;
-            animation: fadeIn 1.5s ease;
         }
-
-        form {
-            margin: 40px auto 20px;
+        header {
+            background: #1e293b;
+            padding: 25px 0;
+            color: white;
             text-align: center;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            width: 60%;
-            animation: slideInTop 1s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        label {
+        h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .form-section {
+            text-align: center;
+            margin: 40px auto;
+        }
+        .form-box {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .form-box label {
             margin: 0 15px;
             font-weight: 500;
             font-size: 16px;
         }
-
-        input[type="submit"] {
-            padding: 10px 30px;
-            margin-top: 20px;
-            background-color: #4CAF50;
+        .form-box input[type="submit"] {
+            margin-left: 20px;
+            padding: 10px 24px;
+            font-size: 16px;
+            background: #3b82f6;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s;
         }
-
-        input[type="submit"]:hover {
-            background-color: #388E3C;
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 25px;
-            margin: 20px auto;
-            width: 85%;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            animation: fadeIn 1s ease;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-            animation: shake 0.4s ease;
-        }
-
-        table {
-            border-collapse: collapse;
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px auto;
             width: 90%;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            animation: fadeIn 1.2s ease;
         }
-
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            text-align: center;
+            width: 220px;
+            transition: transform 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+        }
+        .metric-card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+        .metric-card p {
+            font-size: 22px;
+            font-weight: 600;
+            color: #111;
+        }
+        table {
+            width: 95%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
         th, td {
-            padding: 14px 12px;
+            padding: 14px;
             text-align: center;
         }
-
         th {
-            background: #4CAF50;
+            background: #3b82f6;
             color: white;
         }
-
         tr:nth-child(even) {
-            background: #f2f2f2;
+            background: #f9fafb;
         }
-
         tr:hover {
-            background: #d7f0db;
-            transition: background 0.3s ease;
+            background: #e0f2fe;
         }
-
-        img {
-            display: block;
-            margin: 30px auto;
-            max-width: 700px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
         .chart-container {
-            width: 85%;
+            width: 90%;
             margin: 40px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            animation: fadeIn 1.3s ease;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
-
         canvas {
             margin-top: 15px;
         }
-
-        @keyframes fadeIn {
-            from {opacity: 0;}
-            to {opacity: 1;}
+        .error {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
         }
-
-        @keyframes slideInTop {
-            from {
-                opacity: 0;
-                transform: translateY(-40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        h4 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 20px;
+            color: #333;
         }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            50% { transform: translateX(4px); }
-            75% { transform: translateX(-4px); }
-            100% { transform: translateX(0); }
-        }
-        
     </style>
 </head>
-
 <body>
-    <h2>Sales Forecasting & Product Analysis</h2>
-    <form method="post">
-        <label><input type="radio" name="range" value="60" required> Last 60 Days</label>
-        <label><input type="radio" name="range" value="90"> Last 90 Days</label>
-        <label><input type="radio" name="range" value="120"> Last 120 Days</label><br>
-        <input type="submit" value="Analyze">
-    </form>
+    <header>
+        <h1>📊 Prediction Dashboard</h1>
+    </header>
+
+    <section class="form-section">
+        <form method="post" class="form-box">
+            <label><input type="radio" name="range" value="60" required> Last 60 Days</label>
+            <label><input type="radio" name="range" value="90"> Last 90 Days</label>
+            <label><input type="radio" name="range" value="120"> Last 120 Days</label>
+            <input type="submit" value="Analyze">
+        </form>
+    </section>
 
     <?php if (isset($data)): ?>
         <?php if (isset($data['error'])): ?>
-            <h3 class="error">Error: <?= htmlspecialchars($data['error']) ?></h3>
+            <div class="error">Error: <?= htmlspecialchars($data['error']) ?></div>
         <?php else: ?>
-            <h3>📈 Overall Sales: <?= htmlspecialchars($data['Overall Sales Summary']['Total Revenue in Selected Range']) ?> RS</h3>
-            <h3>📈 Predicted Overall Sales for Next Month: <?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Revenue)']) ?> RS</h3>
-            <h3>📈 Overall Quantity: <?= htmlspecialchars($data['Overall Sales Summary']['Total Sales in Selected Range']) ?> (Quantity)</h3>
-            <h3>📈 Predicted Overall Quantity for Next Month: <?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?> (Quantity)</h3>
+            <section class="metrics">
+                <div class="metric-card">
+                    <h3>Total Revenue</h3>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Total Revenue in Selected Range']) ?> RS</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Predicted Revenue</h3>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Revenue)']) ?> RS</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Quantity</h3>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Total Sales in Selected Range']) ?> Units</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Predicted Quantity</h3>
+                    <p><?= htmlspecialchars($data['Overall Sales Summary']['Predicted Overall Sales for Next Month (Qty)']) ?> Units</p>
+                </div>
+            </section>
+
             <h4>📦 Product-wise Forecast, Total Sold, and Sales Price</h4>
             <table>
                 <thead>
@@ -206,8 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>Product Name</th>
                         <th>Total Quantity Sold</th>
                         <th>Total Sales Price</th>
-                        <th>Predicted Quantity for Next Month</th>
-                        <th>Predicted Sales Price for Next Month</th>
+                        <th>Predicted Quantity</th>
+                        <th>Predicted Sales Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -231,10 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </tbody>
             </table>
 
-            <h4>📊 Monthly Sales Trend</h4>
-            <img src="sales_trend.png" alt="Sales Trend Graph" width="700">
-
-            <h4>📈 Product-wise Sales: Previous vs Predicted (All in One Chart)</h4>
+            <h4>📈 Product-wise Sales: Previous vs Predicted</h4>
             <div class="chart-container">
                 <canvas id="multiLineChart"></canvas>
             </div>
@@ -242,8 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <script>
                 const labels = ['Total Sales', 'Next Month'];
                 const datasets = [];
-                const brightColors = ['#FF6B6B', '#4ECDC4', '#FF9F1C', '#7F00FF', '#00B8D9', '#36D399', '#F9A825', '#C51162', '#1DE9B6', '#FFD54F'];
+                const brightColors = ['#FF6B6B', '#4ECDC4', '#FF9F1C', '#7F00FF', '#00B8D9'];
                 let colorIndex = 0;
+
                 <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
                     <?php
                         $predicted_sales_price = 0;
@@ -255,16 +253,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     datasets.push({
                         label: "<?= addslashes($product['product_name']) ?>",
                         data: [<?= $product['total_sales_price'] ?>, <?= $predicted_sales_price ?>],
-                        borderColor: brightColors[colorIndex % brightColors.length],
                         backgroundColor: brightColors[colorIndex % brightColors.length] + 'CC',
-                        fill: false,
-                        tension: 0.4
+                        borderColor: brightColors[colorIndex % brightColors.length],
+                        borderWidth: 2
                     });
                     colorIndex++;
                 <?php endforeach; ?>
+
                 new Chart(document.getElementById('multiLineChart'), {
                     type: 'bar',
-                    data: { labels: labels, datasets: datasets },
+                    data: { labels, datasets },
                     options: {
                         responsive: true,
                         plugins: {
@@ -272,46 +270,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             tooltip: { mode: 'index', intersect: false }
                         },
                         scales: {
-                            y: { beginAtZero: true, title: { display: true, text: 'Sales in RS' } }
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Sales (RS)' }
+                            }
                         }
                     }
                 });
 
-                // 🔥 Top 5 High Priority Products (New Chart)
-                const productForecasts = <?php echo json_encode($data['Product-wise Forecasts']); ?>;
-                const sorted = productForecasts.sort((a, b) => b.predicted_next_month - a.predicted_next_month);
-                const top5 = sorted.slice(0, 5);
-                const priorityLabels = top5.map(p => p.product_name);
-                const priorityData = top5.map(p => p.predicted_next_month);
-                const priorityColors = ['#e74c3c', '#f39c12', '#3498db', '#1abc9c', '#9b59b6'];
+                // 🔥 Top 5 High-Priority Products Chart
+                const productForecasts = <?= json_encode($data['Product-wise Forecasts']) ?>;
+                const top5 = productForecasts.sort((a, b) => b.predicted_next_month - a.predicted_next_month).slice(0, 5);
+                const topLabels = top5.map(p => p.product_name);
+                const topData = top5.map(p => p.predicted_next_month);
+                const colors = ['#e74c3c', '#f39c12', '#3498db', '#1abc9c', '#9b59b6'];
 
-                const priorityCtx = document.createElement('canvas');
-                priorityCtx.id = 'priorityChart';
-                document.body.insertAdjacentHTML('beforeend', '<h4>🔥 Top 5 High-Priority Products for Next Month (by Quantity)</h4><div class="chart-container"></div>');
-                document.querySelector('.chart-container:last-child').appendChild(priorityCtx);
+                const canvas = document.createElement('canvas');
+                canvas.id = 'priorityChart';
+                document.body.insertAdjacentHTML('beforeend', '<h4>🔥 Top 5 Priority Products</h4><div class="chart-container"></div>');
+                document.querySelector('.chart-container:last-child').appendChild(canvas);
 
-                new Chart(priorityCtx, {
+                new Chart(canvas, {
                     type: 'bar',
                     data: {
-                        labels: priorityLabels,
+                        labels: topLabels,
                         datasets: [{
                             label: 'Predicted Qty (Next Month)',
-                            data: priorityData,
-                            backgroundColor: priorityColors,
-                            borderColor: priorityColors,
+                            data: topData,
+                            backgroundColor: colors,
                             borderWidth: 1
                         }]
                     },
                     options: {
                         indexAxis: 'y',
-                        responsive: true,
                         plugins: {
                             legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => `${ctx.parsed.x} Units`
-                                }
-                            },
                             title: {
                                 display: true,
                                 text: '💡 Restock These First!'
