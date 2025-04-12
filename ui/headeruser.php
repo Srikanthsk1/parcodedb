@@ -147,8 +147,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </p>
               </a>
               </li>
+              <li class="nav-item">
+                <a href="Analysis Dashboard.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Analysis Dashboard</p>
+                </a>
+              </li>
             </ul>
           </li>
+          
           <li class="nav-item">
             <a href="predict.php" class="nav-link">
             <i class="nav-icon fas fa-chart-bar"></i>
@@ -159,10 +166,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
           </li>
 
+          <li class="nav-item">
+            <a href="taxdis.php" class="nav-link">
+            <i class="nav-icon fas fa-calculator"></i>
+              <p>
+               Tax & Discount
+              
+              </p>
+            </a>
+          </li>
+
        
           <li class="nav-item">
             <a href="changepassword.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-user-lock"></i>
               <p>
                 Change Password
                 
@@ -174,7 +191,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
           <li class="nav-item">
             <a href="logout.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-sign-out-alt"></i>
               <p>
                 Logout
                

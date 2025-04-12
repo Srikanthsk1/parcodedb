@@ -178,8 +178,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>Graph Report</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="Analysis Dashboard.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Analysis Dashboard</p>
+                </a>
+              </li>
             </ul>
           </li>
+          
 
       
 
