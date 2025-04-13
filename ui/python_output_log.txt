@@ -548,6 +548,7 @@ CMD: python model.py "2024-12-13" "2025-04-12" 2>&1
 Output:
 {"Overall Sales Summary": {"Total Sales in Selected Range": 170, "Total Revenue in Selected Range": 38150.0, "Predicted Overall Sales for Next Month (Qty)": 126, "Predicted Overall Sales for Next Month (Revenue)": 28172.62}, "Product-wise Forecasts": [{"product_id": 1, "product_name": "Kangaro Stapler Pins", "total_sold_quantity": 15, "total_sales_price": 750.0, "predicted_next_month": 8}, {"product_id": 2, "product_name": "Kangaro Stapler", "total_sold_quantity": 8, "total_sales_price": 1600.0, "predicted_next_month": 13}, {"product_id": 3, "product_name": "kissan tomato katchup", "total_sold_quantity": 35, "total_sales_price": 5600.0, "predicted_next_month": 33}, {"product_id": 4, "product_name": "lenovo charger", "total_sold_quantity": 22, "total_sales_price": 17600.0, "predicted_next_month": 18}, {"product_id": 5, "product_name": "Veg Burger", "total_sold_quantity": 45, "total_sales_price": 3600.0, "predicted_next_month": 37}, {"product_id": 6, "product_name": "Suger Packet 5 KG", "total_sold_quantity": 45, "total_sales_price": 9000.0, "predicted_next_month": 36}]}
 
+<<<<<<< HEAD
 CMD: python model.py "2025-02-12" "2025-04-13" 2>&1
 
 Output:
@@ -613,3 +614,5 @@ CMD: python model.py "2024-12-14" "2025-04-13" 2>&1
 Output:
 {"Overall Sales Summary": {"Total Sales in Selected Range": 163, "Total Revenue in Selected Range": 37580.0, "Predicted Overall Sales for Next Month (Qty)": 170, "Predicted Overall Sales for Next Month (Revenue)": 37070.0}, "Product-wise Forecasts": [{"product_id": 1, "product_name": "Kangaro Stapler Pins", "total_sold_quantity": 10, "total_sales_price": 500.0, "predicted_next_month": 11}, {"product_id": 2, "product_name": "Kangaro Stapler", "total_sold_quantity": 8, "total_sales_price": 1600.0, "predicted_next_month": 14}, {"product_id": 3, "product_name": "kissan tomato katchup", "total_sold_quantity": 33, "total_sales_price": 5280.0, "predicted_next_month": 47}, {"product_id": 4, "product_name": "lenovo charger", "total_sold_quantity": 22, "total_sales_price": 17600.0, "predicted_next_month": 19}, {"product_id": 5, "product_name": "Veg Burger", "total_sold_quantity": 45, "total_sales_price": 3600.0, "predicted_next_month": 40}, {"product_id": 6, "product_name": "Suger Packet 5 KG", "total_sold_quantity": 45, "total_sales_price": 9000.0, "predicted_next_month": 39}]}
 
+=======
+>>>>>>> 691e9c3de5f2e814265aaa444c85b328f5675382
