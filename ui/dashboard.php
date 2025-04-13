@@ -430,10 +430,7 @@ if($row->payment_type=="Cash"){
 
 
 <?php
-
 include_once "footer.php";
-
-
 ?>
 
 <script>

@@ -18,7 +18,7 @@ DB_CONFIG = {
 }
 engine = create_engine("mysql+pymysql://root:@localhost/pos_barcode_db")
 
-# 🔧 Helper function to convert NumPy types to native Python types
+# 🔧 Convert NumPy types to native Python types
 def convert_numpy_types(obj):
     if isinstance(obj, list):
         return [convert_numpy_types(item) for item in obj]
@@ -62,7 +62,7 @@ def prepare_data(df):
     df['sales_price'] = df['quantity'] * df['price']
     return df
 
-def product_level_forecasting(df):
+def product_level_forecasting(df, growth_factor=None):
     results = []
     monthly_all = []
 
@@ -79,13 +79,22 @@ def product_level_forecasting(df):
         monthly['month_num'] = range(len(monthly))
         monthly_all.append(monthly.assign(product_id=product_id, product_name=product_name))
 
-        if len(monthly) >= 3:
+        if len(monthly) > 1:
+            monthly['quantity_growth'] = monthly['quantity'].pct_change() * 100
+            avg_growth_rate = monthly['quantity_growth'].mean()
+        else:
+            avg_growth_rate = 0
+
+        growth_target = group['quantity'].sum() * (1 + (avg_growth_rate if growth_factor is None else growth_factor) / 100)
+
+        if len(monthly) > 0:
             model = RandomForestRegressor(n_estimators=100, random_state=42)
             model.fit(monthly[['month_num']], monthly['quantity'])
             next_month = pd.DataFrame([[monthly['month_num'].max() + 1]], columns=['month_num'])
-            final_prediction = model.predict(next_month)[0]
+            predicted_raw = model.predict(next_month)[0]
+            predicted_quantity = max(predicted_raw, growth_target)
         else:
-            final_prediction = monthly['quantity'].mean()
+            predicted_quantity = growth_target
 
         total_sold_quantity = group['quantity'].sum()
         total_sales_price = group['sales_price'].sum()
@@ -95,13 +104,13 @@ def product_level_forecasting(df):
             'product_name': product_name,
             'total_sold_quantity': int(total_sold_quantity),
             'total_sales_price': round(float(total_sales_price), 2),
-            'predicted_next_month': round(float(final_prediction), 2)
+            'predicted_next_month': round(predicted_quantity)
         })
 
     monthly_all_df = pd.concat(monthly_all)
     return results, monthly_all_df
 
-def overall_forecasting(df):
+def overall_forecasting(df, growth_factor=None):
     monthly = df.groupby(df['sale_date'].dt.to_period('M')).agg({
         'quantity': 'sum',
         'sales_price': 'sum'
@@ -114,21 +123,30 @@ def overall_forecasting(df):
     total_sales = df['sales_price'].sum()
     avg_price_per_unit = total_sales / total_quantity if total_quantity else 0
 
-    if len(monthly) >= 3:
+    if len(monthly) > 1:
+        monthly['quantity_growth'] = monthly['quantity'].pct_change() * 100
+        avg_growth_rate = monthly['quantity_growth'].mean()
+    else:
+        avg_growth_rate = 0
+
+    growth_target = total_quantity * (1 + (avg_growth_rate if growth_factor is None else growth_factor) / 100)
+
+    if len(monthly) > 0:
         model = RandomForestRegressor(n_estimators=100, random_state=42)
         model.fit(monthly[['month_num']], monthly['quantity'])
         next_month = pd.DataFrame([[monthly['month_num'].max() + 1]], columns=['month_num'])
-        predicted_quantity = model.predict(next_month)[0]
+        predicted_raw = model.predict(next_month)[0]
+        predicted_quantity = max(predicted_raw, growth_target)
     else:
-        predicted_quantity = monthly['quantity'].mean()
+        predicted_quantity = growth_target
 
-    predicted_sales_value = predicted_quantity * avg_price_per_unit
+    predicted_sales_value = round(predicted_quantity * avg_price_per_unit, 2)
 
     return {
         'total_sold_quantity': int(total_quantity),
         'total_sales_price': round(float(total_sales), 2),
-        'predicted_next_month_quantity': round(float(predicted_quantity), 2),
-        'predicted_next_month_sales': round(float(predicted_sales_value), 2)
+        'predicted_next_month_quantity': round(predicted_quantity),
+        'predicted_next_month_sales': predicted_sales_value
     }, monthly
 
 def visualize(monthly_all_df, overall_monthly, overall_pred):
@@ -155,6 +173,30 @@ def main(from_date, to_date):
             df = prepare_data(df)
             product_forecasts, monthly_all = product_level_forecasting(df)
             overall_result, overall_monthly = overall_forecasting(df)
+
+            # 👉 SCALE product-level predictions to match overall prediction
+            total_predicted_product_qty = sum(p['predicted_next_month'] for p in product_forecasts)
+            overall_predicted_qty = overall_result['predicted_next_month_quantity']
+
+            if total_predicted_product_qty > 0:
+                scale_factor = overall_predicted_qty / total_predicted_product_qty
+            else:
+                scale_factor = 1
+
+            for product in product_forecasts:
+                original_pred_qty = product['predicted_next_month']
+                scaled_pred_qty = round(original_pred_qty * scale_factor)
+                product['predicted_next_month'] = scaled_pred_qty
+
+            # Recalculate total predicted revenue from scaled product forecasts
+            predicted_total_revenue = 0
+            for product in product_forecasts:
+                avg_price = product['total_sales_price'] / product['total_sold_quantity'] if product['total_sold_quantity'] else 0
+                predicted_total_revenue += product['predicted_next_month'] * avg_price
+
+            predicted_total_revenue = round(predicted_total_revenue, 2)
+            overall_result['predicted_next_month_sales'] = predicted_total_revenue
+
             visualize(monthly_all, overall_monthly, overall_result)
 
             output = {
