@@ -320,55 +320,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="chart-container">
                 <img src="sales_trend.png" alt="Sales Chart">
             </div>
-            <h4>📈 Product-wise Sales: Previous vs Predicted</h4>
+            <h4>📈 Product Sales Comparison (Previous vs Predicted)</h4>
+
             <div class="chart-container">
                 <canvas id="multiLineChart"></canvas>
             </div>
 
             <script>
-                const labels = ['Total Sales', 'Next Month'];
-                const datasets = [];
-                const brightColors = ['#FF6B6B', '#4ECDC4', '#FF9F1C', '#7F00FF', '#00B8D9'];
-                let colorIndex = 0;
+                const productForecasts = <?= json_encode($data['Product-wise Forecasts']) ?>;
 
-                <?php foreach ($data['Product-wise Forecasts'] as $product): ?>
-                    <?php
-                    $predicted_sales_price = 0;
-                    if ($product['total_sold_quantity'] > 0) {
-                        $unit_price = $product['total_sales_price'] / $product['total_sold_quantity'];
-                        $predicted_sales_price = $product['predicted_next_month'] * $unit_price;
+                const productLabels = productForecasts.map(p => p.product_name);
+                const previousSales = productForecasts.map(p => p.total_sales_price);
+                const predictedSales = productForecasts.map(p => {
+                    if (p.total_sold_quantity > 0) {
+                        const unitPrice = p.total_sales_price / p.total_sold_quantity;
+                        return p.predicted_next_month * unitPrice;
                     }
-                    ?>
-                    datasets.push({
-                        label: "<?= addslashes($product['product_name']) ?>",
-                        data: [<?= $product['total_sales_price'] ?>, <?= $predicted_sales_price ?>],
-                        backgroundColor: brightColors[colorIndex % brightColors.length] + 'CC',
-                        borderColor: brightColors[colorIndex % brightColors.length],
-                        borderWidth: 2
-                    });
-                    colorIndex++;
-                <?php endforeach; ?>
+                    return 0;
+                });
 
-                new Chart(document.getElementById('multiLineChart'), {
+                const salesChartCanvas = document.getElementById('multiLineChart');
+
+                new Chart(salesChartCanvas, {
                     type: 'bar',
-                    data: { labels, datasets },
+                    data: {
+                        labels: productLabels,
+                        datasets: [
+                            {
+                                label: 'Previous Sales Price',
+                                data: previousSales,
+                                backgroundColor: '#f87171' // red
+                            },
+                            {
+                                label: 'Predicted Sales Price',
+                                data: predictedSales,
+                                backgroundColor: '#34d399' // green
+                            }
+                        ]
+                    },
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: { position: 'bottom' },
-                            tooltip: { mode: 'index', intersect: false }
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function (context) {
+                                        const i = context[0].dataIndex;
+                                        const gap = predictedSales[i] - previousSales[i];
+                                        return `Change: ${gap > 0 ? '+' : ''}${gap.toFixed(2)} RS`;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '📈 Product Sales Comparison (Previous vs Predicted)'
+                            },
+                            legend: { position: 'top' }
                         },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                title: { display: true, text: 'Sales (RS)' }
+                                title: {
+                                    display: true,
+                                    text: 'Sales (RS)'
+                                }
                             }
                         }
                     }
                 });
-
-
             </script>
+
             <script>
                 const restockData = <?= json_encode($data['Product-wise Forecasts']) ?>;
                 const availableFromDB = <?= json_encode($productQuantities) ?>;
