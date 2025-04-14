@@ -19,7 +19,7 @@
   <!-- /.control-sidebar -->
 
   <!-- Main Footer -->
-  <footer class="main-footer">
+  <footer class="main-footer"  style="background:rgb(255, 255, 255); color: black; text-align: center;">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
    

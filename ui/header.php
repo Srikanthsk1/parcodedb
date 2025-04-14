@@ -181,8 +181,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>Table Report</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a href="graphreport.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Graph Report</p>
+                </a>
+              </li> -->
+              <li class="nav-item">
+                <a href="analytics 1 dashboaar.php" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Graph Report</p>
                 </a>
@@ -193,12 +199,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>Analysis Dashboard</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="analytics 1 dashboaar.php" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p> Testing Dash board</p>
-                </a>
-              </li>
+              
             </ul>
           </li>
           

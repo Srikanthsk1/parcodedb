@@ -7,8 +7,26 @@
         /* touch-action: none;  */
     }
 </style>
+<?php
+$host = "localhost";
+$user = "root";
+$password = ""; // or your actual password
+$database = "pos_barcode_db"; // replace this
+
+$conn = new mysqli($host, $user, $password, $database);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
 
 <?php
+$productQuantities = [];
+$result = $conn->query("SELECT product, stock FROM tbl_product");
+while ($row = $result->fetch_assoc()) {
+    $productQuantities[$row['product']] = (int) $row['stock'];
+}
 $data = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -194,35 +212,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .dashboard-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 1000; /* Make sure it stays on top */
-}
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            /* Make sure it stays on top */
+        }
 
-.dashboard-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
+        .dashboard-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
 
-.dashboard-btn:hover {
-    background-color: #45a049;
-    transform: scale(1.05);
-}
-
+        .dashboard-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>📊 Prediction Dashboard  </h1><div class="dashboard-container"><a href="dashboard.php" class="dashboard-btn">Dashboard</a></div>
+        <h1>📊 Prediction Dashboard </h1>
+        <div class="dashboard-container"><a href="dashboard.php" class="dashboard-btn">Dashboard</a></div>
     </header>
 
     <section class="form-section">
@@ -348,53 +367,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 });
 
-                // 🔥 Top 5 High-Priority Products Chart
-                const productForecasts = <?= json_encode($data['Product-wise Forecasts']) ?>;
-                const top5 = productForecasts.sort((a, b) => b.predicted_next_month - a.predicted_next_month).slice(0, 5);
-                const topLabels = top5.map(p => p.product_name);
-                const topData = top5.map(p => p.predicted_next_month);
-                const colors = ['#e74c3c', '#f39c12', '#3498db', '#1abc9c', '#9b59b6'];
 
-                const canvas = document.createElement('canvas');
-                canvas.id = 'priorityChart';
-                document.body.insertAdjacentHTML('beforeend', '<br><br><h4>🔥 Top 5 Priority Products</h4><div class="chart-container"></div>');
-                document.querySelector('.chart-container:last-child').appendChild(canvas);
+            </script>
+            <script>
+                const restockData = <?= json_encode($data['Product-wise Forecasts']) ?>;
+                const availableFromDB = <?= json_encode($productQuantities) ?>;
 
-                new Chart(canvas, {
+                const sortedRestock = restockData
+                    .map(p => {
+                        const available = availableFromDB[p.product_name] ?? 0;
+                        return {
+                            name: p.product_name,
+                            predicted: p.predicted_next_month,
+                            available: available,
+                            gap: p.predicted_next_month - available
+                        };
+                    })
+                    .sort((a, b) => b.gap - a.gap)
+                    .slice(0, 10);
+
+                const restockLabels = sortedRestock.map(p => p.name);
+                const predictedQty = sortedRestock.map(p => p.predicted);
+                const availableQty = sortedRestock.map(p => p.available);
+
+                const restockCanvas = document.createElement('canvas');
+                restockCanvas.id = 'restockChart';
+                document.body.insertAdjacentHTML('beforeend', '<br><br><h4>📦 Restock the Product</h4><div class="chart-container"></div>');
+                document.querySelector('.chart-container:last-child').appendChild(restockCanvas);
+
+                new Chart(restockCanvas, {
                     type: 'bar',
                     data: {
-                        labels: topLabels,
-                        datasets: [{
-                            label: 'Predicted Qty (Next Month)',
-                            data: topData,
-                            backgroundColor: colors,
-                            borderWidth: 1
-                        }]
+                        labels: restockLabels,
+                        datasets: [
+                            {
+                                label: 'Available Quantity',
+                                data: availableQty,
+                                backgroundColor: '#60a5fa'
+                            },
+                            {
+                                label: 'Predicted Demand',
+                                data: predictedQty,
+                                backgroundColor: '#f97316'
+                            }
+                        ]
                     },
                     options: {
-                        indexAxis: 'y',
+                        responsive: true,
                         plugins: {
-                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function (context) {
+                                        const i = context[0].dataIndex;
+                                        const gap = sortedRestock[i].gap;
+                                        return `Gap: ${gap > 0 ? '+' : ''}${gap} units`;
+                                    }
+                                }
+                            },
                             title: {
                                 display: true,
-                                text: '💡 Restock These First!'
-                            }
+                                text: '🔁 Restocking Priority (Demand vs Available)'
+                            },
+                            legend: { position: 'top' }
                         },
                         scales: {
-                            x: {
+                            y: {
                                 beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Predicted Quantity'
-                                }
+                                title: { display: true, text: 'Quantity' }
                             }
                         }
                     }
                 });
             </script>
+
+
         <?php endif; ?>
     <?php endif; ?>
-    
+
 
 
 </body>
