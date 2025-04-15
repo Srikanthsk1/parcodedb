@@ -316,6 +316,7 @@ if($_SESSION['role']=="Admin"){
                     $femaleCounts[] = $row['female_count'];
                 }
 
+                // City Based Sales Percentage
                 $select = $pdo->prepare("SELECT DATE_FORMAT(tbl_invoice.order_date, '%Y-%m') as month, 
                                                 tbl_customer.city, 
                                                 SUM(tbl_invoice.total) as sales 
@@ -328,27 +329,42 @@ if($_SESSION['role']=="Admin"){
                 $select->execute();
 
                 $citySalesData = [];
-                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                    $citySalesData[$row['month']][$row['city']] = $row['sales'];
-                }
-
-                $months = array_keys($citySalesData);
                 $cities = [];
-                foreach ($citySalesData as $month => $cityData) {
-                    foreach ($cityData as $city => $sales) {
-                        if (!in_array($city, $cities)) {
-                            $cities[] = $city;
-                        }
+
+                // Collect raw sales data
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    $month = $row['month'];
+                    $city = $row['city'];
+                    $sales = $row['sales'];
+                    $citySalesData[$month][$city] = $sales;
+                    if (!in_array($city, $cities)) {
+                        $cities[] = $city;
                     }
                 }
 
-                $salesData = [];
-                foreach ($months as $month) {
-                    $monthlySales = [];
-                    foreach ($cities as $city) {
-                        $monthlySales[] = isset($citySalesData[$month][$city]) ? $citySalesData[$month][$city] : 0;
+                // Generate all months between fromdate and todate
+                $months = [];
+                if (!empty($_POST['date_1']) && !empty($_POST['date_2'])) {
+                    $start = new DateTime($_POST['date_1']);
+                    $end = new DateTime($_POST['date_2']);
+                    $interval = DateInterval::createFromDateString('1 month');
+                    $period = new DatePeriod($start, $interval, $end->modify('+1 month'));
+                    foreach ($period as $dt) {
+                        $months[] = $dt->format('Y-m');
                     }
-                    $salesData[] = $monthlySales;
+                }
+
+                // Calculate percentages
+                $salesPercentageData = [];
+                foreach ($months as $month) {
+                    $totalMonthSales = array_sum($citySalesData[$month] ?? []);
+                    $monthlyPercentages = [];
+                    foreach ($cities as $city) {
+                        $sales = $citySalesData[$month][$city] ?? 0;
+                        $percentage = $totalMonthSales > 0 ? ($sales / $totalMonthSales) * 100 : 0;
+                        $monthlyPercentages[] = round($percentage, 2);
+                    }
+                    $salesPercentageData[] = $monthlyPercentages;
                 }
 
                 $select = $pdo->prepare("
@@ -716,27 +732,41 @@ if($_SESSION['role']=="Admin"){
         },
     });
 
-    // City Based Sales Percentage Bar Chart
+    // City Based Sales Percentage Stacked Area Chart
     const ctxCityPercentage = document.getElementById('citySalesPercentageChart').getContext('2d');
     const months = <?php echo json_encode($months); ?>;
     const cities = <?php echo json_encode($cities); ?>;
-    const salesData = <?php echo json_encode($salesData); ?>;
-    
+    const salesPercentageData = <?php echo json_encode($salesPercentageData); ?>;
+
     const datasets = cities.map((city, index) => {
-        const citySales = salesData.map(monthlySales => monthlySales[index]);
+        const cityPercentages = salesPercentageData.map(monthlyPercentages => monthlyPercentages[index]);
         return {
             label: city,
-            data: citySales,
-            backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
-            borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+            data: cityPercentages,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)'
+            ][index % 6],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ][index % 6],
             borderWidth: 1,
-            barThickness: 20,
-            maxBarThickness: 40
+            fill: false,
+            
         };
     });
 
     new Chart(ctxCityPercentage, {
-        type: 'bar',
+        type: 'line', // Changed to line for stacked area chart
         data: {
             labels: months,
             datasets: datasets
@@ -751,27 +781,54 @@ if($_SESSION['role']=="Admin"){
                 title: {
                     display: true,
                     text: 'City Based Sales Percentage by Month'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.y.toFixed(2) + '%';
+                            return label;
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 100,
                     stacked: true,
                     ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        },
                         font: {
                             size: 14
                         }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Percentage of Sales'
                     }
                 },
                 x: {
                     stacked: true,
                     ticks: {
+                        autoSkip: false, // Show all month labels
+                        maxRotation: 45, // Rotate if needed
+                        minRotation: 0,
                         font: {
-                            size: 14
+                            size: 12
                         }
                     },
                     grid: {
                         display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Month'
                     }
                 }
             },
@@ -783,7 +840,7 @@ if($_SESSION['role']=="Admin"){
                     bottom: 10
                 }
             }
-        },
+        }
     });
 
     // Year-over-Year Growth Line Chart
