@@ -389,7 +389,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             </script>
 
-            <script>
+            <!-- <script>
                 const restockData = <?= json_encode($data['Product-wise Forecasts']) ?>;
                 const availableFromDB = <?= json_encode($productQuantities) ?>;
 
@@ -458,7 +458,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 });
-            </script>
+            </script> -->
+            <script>
+    const restockData = <?= json_encode($data['Product-wise Forecasts']) ?>;
+    const availableFromDB = <?= json_encode($productQuantities) ?>;
+
+    const sortedRestock = restockData
+        .map(p => {
+            const available = availableFromDB[p.product_name] ?? 0;
+            return {
+                name: p.product_name,
+                predicted: p.predicted_next_month,
+                available: available,
+                gap: p.predicted_next_month - available
+            };
+        })
+        .sort((a, b) => b.gap - a.gap)
+        .slice(0, 10);
+
+    const restockLabels = sortedRestock.map(p => p.name);
+    const predictedQty = sortedRestock.map(p => p.predicted);
+    const availableQty = sortedRestock.map(p => p.available);
+
+    const restockCanvas = document.createElement('canvas');
+    restockCanvas.id = 'restockChart';
+    document.body.insertAdjacentHTML('beforeend', '<br><br><h4>📦 Restock the Product</h4><div class="chart-container"></div>');
+    document.querySelector('.chart-container:last-child').appendChild(restockCanvas);
+
+    new Chart(restockCanvas, {
+        type: 'bar',
+        data: {
+            labels: restockLabels,
+            datasets: [
+                {
+                    label: 'Available Quantity',
+                    data: availableQty,
+                    backgroundColor: '#60a5fa'
+                },
+                {
+                    label: 'Predicted Demand',
+                    data: predictedQty,
+                    backgroundColor: '#f97316'
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y', // Make bars horizontal
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        afterBody: function (context) {
+                            const i = context[0].dataIndex;
+                            const gap = sortedRestock[i].gap;
+                            return `Gap: ${gap > 0 ? '+' : ''}${gap} units`;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: '🔁 Restocking Priority (Demand vs Available)'
+                },
+                legend: { 
+                    position: 'top' 
+                }
+            },
+            scales: {
+                x: { // Quantities on x-axis
+                    beginAtZero: true,
+                    title: { 
+                        display: true, 
+                        text: 'Quantity' 
+                    }
+                },
+                y: { // Product names on y-axis
+                    title: { 
+                        display: false // No title needed for product names
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 
         <?php endif; ?>
