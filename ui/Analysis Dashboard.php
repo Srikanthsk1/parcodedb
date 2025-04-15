@@ -22,13 +22,65 @@ if($_SESSION['role']=="Admin"){
 <link rel="stylesheet" href="../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 
 <style>
-    html {
+    html, body {
         margin: 0;
         padding: 0;
-        overflow-x: hidden;
-        overscroll-behavior: none;  
+        height: 100%;
     }
-    
+
+    /* Wrapper to handle layout */
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Full viewport height */
+    }
+
+    /* Sidebar - fixed and non-scrollable */
+    .main-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 250px; /* Adjust based on your sidebar width */
+        height: 100vh; /* Full viewport height */
+        overflow: hidden !important; /* Absolutely prevent scrolling */
+        z-index: 1000;
+        background: #343a40; /* AdminLTE sidebar background */
+    }
+
+    /* Ensure sidebar content doesn't scroll */
+    .sidebar {
+        height: 100%;
+        max-height: 100vh; /* Constrain to viewport height */
+        overflow: hidden !important; /* No scrolling for sidebar content */
+        padding-bottom: 0; /* Prevent padding from pushing content */
+    }
+
+    /* Prevent sidebar children from triggering scroll */
+    .sidebar * {
+        overflow: hidden !important; /* Ensure no child elements scroll */
+    }
+
+    /* Main content area - scrollable */
+    .content-wrapper {
+        flex: 1;
+        overflow-y: auto; /* Enable scrolling for content */
+        margin-left: 250px; /* Adjust based on sidebar width */
+        padding-bottom: 60px; /* Space for footer */
+        min-height: calc(100vh - 60px); /* Ensure content stretches to footer */
+    }
+
+    /* Footer - fixed and non-scrollable */
+    .main-footer {
+        position: fixed;
+        bottom: 0;
+        width: calc(100% - 250px); /* Adjust for sidebar width */
+        margin-left: 250px; /* Align with content */
+        background: #f4f6f9;
+        padding: 10px;
+        border-top: 1px solid #dee2e6;
+        z-index: 999;
+    }
+
     /* Enhanced Dashboard Styles */
     .dashboard-header {
         background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
@@ -115,370 +167,394 @@ if($_SESSION['role']=="Admin"){
         .chart-container {
             min-height: 250px;
         }
+        .content-wrapper {
+            margin-left: 0; /* Remove margin for mobile if sidebar collapses */
+        }
+        .main-footer {
+            margin-left: 0;
+            width: 100%;
+        }
+        .main-sidebar {
+            width: 250px;
+            transform: translateX(-250px); /* Hide sidebar off-screen */
+            transition: transform 0.3s ease;
+            height: 100vh; /* Ensure full height */
+            overflow: hidden !important; /* No scrolling on mobile */
+        }
+        .main-sidebar.active {
+            transform: translateX(0); /* Show sidebar when toggled */
+        }
+        .sidebar {
+            max-height: 100vh;
+            overflow: hidden !important;
+        }
     }
 </style>
 
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
-    <!-- Enhanced Content Header -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="dashboard-header">
-                <div class="row align-items-center">
-                    <div class="col-sm-6">
-                        <h1 class="m-0"><i class="fas fa-chart-line mr-2"></i>Analysis Report Dashboard</h1>
-                    </div>
-                    <div class="col-sm-6 text-right">
-                        <div class="date-range-display">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            FROM: <?php echo $_POST['date_1']; ?> — TO: <?php echo $_POST['date_2']; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main content -->
-    <div class="content">
-        <div class="container-fluid">
-            <!-- Date Filter Form -->
-            <form method="post" action="" name="">
-                <div class="date-filter-container">
+<!-- Wrapper for layout -->
+<div class="wrapper">
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Enhanced Content Header -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="dashboard-header">
                     <div class="row align-items-center">
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label class="font-weight-bold">From Date</label>
-                                <div class="input-group date" id="date_1" data-target-input="nearest">
-                                    <input type="text" class="form-control date_1" data-target="#date_1" name="date_1" placeholder="Select start date"/>
-                                    <div class="input-group-append" data-target="#date_1" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        <div class="col-sm-6">
+                            <h1 class="m-0"><i class="fas fa-chart-line mr-2"></i>Analysis Report Dashboard</h1>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <div class="date-range-display">
+                                <i class="far fa-calendar-alt mr-2"></i>
+                                FROM: <?php echo $_POST['date_1']; ?> — TO: <?php echo $_POST['date_2']; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <!-- Date Filter Form -->
+                <form method="post" action="" name="">
+                    <div class="date-filter-container">
+                        <div class="row align-items-center">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">From Date</label>
+                                    <div class="input-group date" id="date_1" data-target-input="nearest">
+                                        <input type="text" class="form-control date_1" data-target="#date_1" name="date_1" placeholder="Select start date"/>
+                                        <div class="input-group-append" data-target="#date_1" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label class="font-weight-bold">To Date</label>
-                                <div class="input-group date" id="date_2" data-target-input="nearest">
-                                    <input type="text" class="form-control date_2" data-target="#date_2" name="date_2" placeholder="Select end date"/>
-                                    <div class="input-group-append" data-target="#date_2" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">To Date</label>
+                                    <div class="input-group date" id="date_2" data-target-input="nearest">
+                                        <input type="text" class="form-control date_2" data-target="#date_2" name="date_2" placeholder="Select end date"/>
+                                        <div class="input-group-append" data-target="#date_2" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary btn-block" name="btnfilter">
-                                <i class="fas fa-filter mr-2"></i>Filter
-                            </button>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-block" name="btnfilter">
+                                    <i class="fas fa-filter mr-2"></i>Filter
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
 
-            <?php
-            $select = $pdo->prepare("select order_date , sum(total) as grandtotal from tbl_invoice where order_date between :fromdate AND :todate group by order_date");
-            $select->bindParam(':fromdate',$_POST['date_1']);
-            $select->bindParam(':todate',$_POST['date_2']);
-            $select->execute();
+                <?php
+                $select = $pdo->prepare("select order_date , sum(total) as grandtotal from tbl_invoice where order_date between :fromdate AND :todate group by order_date");
+                $select->bindParam(':fromdate',$_POST['date_1']);
+                $select->bindParam(':todate',$_POST['date_2']);
+                $select->execute();
 
-            $total=[];
-            $date=[];
+                $total=[];
+                $date=[];
 
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                extract($row);
-                $total[]=$grandtotal;
-                $date[]=$order_date;
-            }
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+                    $total[]=$grandtotal;
+                    $date[]=$order_date;
+                }
 
-            $select = $pdo->prepare("select product_name , sum(qty) as q from tbl_invoice_details where order_date between :fromdate AND :todate group by product_id");
-            $select->bindParam(':fromdate',$_POST['date_1']);
-            $select->bindParam(':todate',$_POST['date_2']);
-            $select->execute();
+                $select = $pdo->prepare("select product_name , sum(qty) as q from tbl_invoice_details where order_date between :fromdate AND :todate group by product_id");
+                $select->bindParam(':fromdate',$_POST['date_1']);
+                $select->bindParam(':todate',$_POST['date_2']);
+                $select->execute();
 
-            $pname=[];
-            $qty=[];
+                $pname=[];
+                $qty=[];
 
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                extract($row);
-                $pname[]=$product_name;
-                $qty[]=$q;
-            }
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+                    $pname[]=$product_name;
+                    $qty[]=$q;
+                }
 
-            $select = $pdo->prepare("select gender, count(*) as count from tbl_customer where order_date between :fromdate AND :todate group by gender");
-            $select->bindParam(':fromdate', $_POST['date_1']);
-            $select->bindParam(':todate', $_POST['date_2']);
-            $select->execute();
+                $select = $pdo->prepare("select gender, count(*) as count from tbl_customer where order_date between :fromdate AND :todate group by gender");
+                $select->bindParam(':fromdate', $_POST['date_1']);
+                $select->bindParam(':todate', $_POST['date_2']);
+                $select->execute();
 
-            $gender = [];
-            $count = [];
+                $gender = [];
+                $count = [];
 
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                $gender[] = $row['gender'];
-                $count[] = $row['count'];
-            }
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    $gender[] = $row['gender'];
+                    $count[] = $row['count'];
+                }
 
-            $select = $pdo->prepare("SELECT DATE_FORMAT(order_date, '%Y-%m') as month, 
-                                            SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) as male_count, 
-                                            SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) as female_count 
-                                     FROM tbl_customer 
-                                     WHERE order_date BETWEEN :fromdate AND :todate 
-                                     GROUP BY month");
-            $select->bindParam(':fromdate', $_POST['date_1']);
-            $select->bindParam(':todate', $_POST['date_2']);
-            $select->execute();
+                $select = $pdo->prepare("SELECT DATE_FORMAT(order_date, '%Y-%m') as month, 
+                                                SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) as male_count, 
+                                                SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) as female_count 
+                                         FROM tbl_customer 
+                                         WHERE order_date BETWEEN :fromdate AND :todate 
+                                         GROUP BY month");
+                $select->bindParam(':fromdate', $_POST['date_1']);
+                $select->bindParam(':todate', $_POST['date_2']);
+                $select->execute();
 
-            $months = [];
-            $maleCounts = [];
-            $femaleCounts = [];
+                $months = [];
+                $maleCounts = [];
+                $femaleCounts = [];
 
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                $months[] = $row['month'];
-                $maleCounts[] = $row['male_count'];
-                $femaleCounts[] = $row['female_count'];
-            }
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    $months[] = $row['month'];
+                    $maleCounts[] = $row['male_count'];
+                    $femaleCounts[] = $row['female_count'];
+                }
 
-            $select = $pdo->prepare("SELECT DATE_FORMAT(tbl_invoice.order_date, '%Y-%m') as month, 
-                                            tbl_customer.city, 
-                                            SUM(tbl_invoice.total) as sales 
-                                     FROM tbl_customer 
-                                     JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id 
-                                     WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate 
-                                     GROUP BY month, tbl_customer.city");
-            $select->bindParam(':fromdate', $_POST['date_1']);
-            $select->bindParam(':todate', $_POST['date_2']);
-            $select->execute();
+                $select = $pdo->prepare("SELECT DATE_FORMAT(tbl_invoice.order_date, '%Y-%m') as month, 
+                                                tbl_customer.city, 
+                                                SUM(tbl_invoice.total) as sales 
+                                         FROM tbl_customer 
+                                         JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id 
+                                         WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate 
+                                         GROUP BY month, tbl_customer.city");
+                $select->bindParam(':fromdate', $_POST['date_1']);
+                $select->bindParam(':todate', $_POST['date_2']);
+                $select->execute();
 
-            $citySalesData = [];
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                $citySalesData[$row['month']][$row['city']] = $row['sales'];
-            }
+                $citySalesData = [];
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    $citySalesData[$row['month']][$row['city']] = $row['sales'];
+                }
 
-            $months = array_keys($citySalesData);
-            $cities = [];
-            foreach ($citySalesData as $month => $cityData) {
-                foreach ($cityData as $city => $sales) {
-                    if (!in_array($city, $cities)) {
-                        $cities[] = $city;
+                $months = array_keys($citySalesData);
+                $cities = [];
+                foreach ($citySalesData as $month => $cityData) {
+                    foreach ($cityData as $city => $sales) {
+                        if (!in_array($city, $cities)) {
+                            $cities[] = $city;
+                        }
                     }
                 }
-            }
 
-            $salesData = [];
-            foreach ($months as $month) {
-                $monthlySales = [];
-                foreach ($cities as $city) {
-                    $monthlySales[] = isset($citySalesData[$month][$city]) ? $citySalesData[$month][$city] : 0;
-                }
-                $salesData[] = $monthlySales;
-            }
-
-            $select = $pdo->prepare("
-                SELECT 
-                    YEAR(order_date) AS year, 
-                    MONTH(order_date) AS month, 
-                    SUM(total) AS sales 
-                FROM tbl_invoice 
-                WHERE order_date BETWEEN :fromdate AND :todate 
-                GROUP BY year, month 
-                ORDER BY year, month
-            ");
-
-            $fromDate = $_POST['date_1'];
-            $toDate = $_POST['date_2'];
-            $select->bindParam(':fromdate', $fromDate);
-            $select->bindParam(':todate', $toDate);
-            $select->execute();
-
-            $yoyData = [];
-            while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
-                $yoyData[$row['year']][$row['month']] = $row['sales'];
-            }
-
-            $yoyMonths = [];
-            $lastYearSales = [];
-            $currentYearSales = [];
-
-            foreach ($yoyData as $year => $data) {
-                foreach ($data as $month => $sales) {
-                    $monthLabel = date('F', mktime(0, 0, 0, $month, 10));
-                    if (!in_array($monthLabel, $yoyMonths)) {
-                        $yoyMonths[] = $monthLabel;
+                $salesData = [];
+                foreach ($months as $month) {
+                    $monthlySales = [];
+                    foreach ($cities as $city) {
+                        $monthlySales[] = isset($citySalesData[$month][$city]) ? $citySalesData[$month][$city] : 0;
                     }
-                    if ($year == date('Y', strtotime($fromDate)) - 1) {
-                        $lastYearSales[] = $sales;
-                    } elseif ($year == date('Y', strtotime($fromDate))) {
-                        $currentYearSales[] = $sales;
+                    $salesData[] = $monthlySales;
+                }
+
+                $select = $pdo->prepare("
+                    SELECT 
+                        YEAR(order_date) AS year, 
+                        MONTH(order_date) AS month, 
+                        SUM(total) AS sales 
+                    FROM tbl_invoice 
+                    WHERE order_date BETWEEN :fromdate AND :todate 
+                    GROUP BY year, month 
+                    ORDER BY year, month
+                ");
+
+                $fromDate = $_POST['date_1'];
+                $toDate = $_POST['date_2'];
+                $select->bindParam(':fromdate', $fromDate);
+                $select->bindParam(':todate', $toDate);
+                $select->execute();
+
+                $yoyData = [];
+                while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
+                    $yoyData[$row['year']][$row['month']] = $row['sales'];
+                }
+
+                $yoyMonths = [];
+                $lastYearSales = [];
+                $currentYearSales = [];
+
+                foreach ($yoyData as $year => $data) {
+                    foreach ($data as $month => $sales) {
+                        $monthLabel = date('F', mktime(0, 0, 0, $month, 10));
+                        if (!in_array($monthLabel, $yoyMonths)) {
+                            $yoyMonths[] = $monthLabel;
+                        }
+                        if ($year == date('Y', strtotime($fromDate)) - 1) {
+                            $lastYearSales[] = $sales;
+                        } elseif ($year == date('Y', strtotime($fromDate))) {
+                            $currentYearSales[] = $sales;
+                        }
                     }
                 }
-            }
 
-            $selectCustomerSegmentation = $pdo->prepare("
-                SELECT name, phone, COUNT(tbl_invoice.invoice_id) AS purchase_count, SUM(tbl_invoice.total) AS total_spent
-                FROM tbl_customer
-                JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id
-                WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate
-                GROUP BY tbl_customer.customer_id
-                ORDER BY total_spent DESC
-            ");
-            $selectCustomerSegmentation->bindParam(':fromdate', $_POST['date_1']);
-            $selectCustomerSegmentation->bindParam(':todate', $_POST['date_2']);
-            $selectCustomerSegmentation->execute();
+                $selectCustomerSegmentation = $pdo->prepare("
+                    SELECT name, phone, COUNT(tbl_invoice.invoice_id) AS purchase_count, SUM(tbl_invoice.total) AS total_spent
+                    FROM tbl_customer
+                    JOIN tbl_invoice ON tbl_customer.customer_id = tbl_invoice.customer_id
+                    WHERE tbl_invoice.order_date BETWEEN :fromdate AND :todate
+                    GROUP BY tbl_customer.customer_id
+                    ORDER BY total_spent DESC
+                ");
+                $selectCustomerSegmentation->bindParam(':fromdate', $_POST['date_1']);
+                $selectCustomerSegmentation->bindParam(':todate', $_POST['date_2']);
+                $selectCustomerSegmentation->execute();
 
-            $customerNames = [];
-            $customerPhones = [];
-            $purchaseCounts = [];
-            $totalSpent = [];
+                $customerNames = [];
+                $customerPhones = [];
+                $purchaseCounts = [];
+                $totalSpent = [];
 
-            while ($row = $selectCustomerSegmentation->fetch(PDO::FETCH_ASSOC)) {
-                $customerNames[] = $row['name'];
-                $customerPhones[] = $row['phone'];
-                $purchaseCounts[] = $row['purchase_count'];
-                $totalSpent[] = $row['total_spent'];
-            }
-            ?>
+                while ($row = $selectCustomerSegmentation->fetch(PDO::FETCH_ASSOC)) {
+                    $customerNames[] = $row['name'];
+                    $customerPhones[] = $row['phone'];
+                    $purchaseCounts[] = $row['purchase_count'];
+                    $totalSpent[] = $row['total_spent'];
+                }
+                ?>
 
-            <!-- Charts Section -->
-            <div class="row">
-                <!-- Best Selling Products -->
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-star mr-2"></i>Best Selling Products</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
+                <!-- Charts Section -->
+                <div class="row">
+                    <!-- Best Selling Products -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-star mr-2"></i>Best Selling Products</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="bestsellingproduct"></canvas>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="bestsellingproduct"></canvas>
+                    </div>
+
+                    <!-- Product Quantity Distribution -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Product Quantity Distribution</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="myPieChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Product Quantity Distribution -->
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Product Quantity Distribution</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
+                <div class="row">
+                    <!-- Gender Distribution -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-venus-mars mr-2"></i>Gender Distribution</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="demograph1"></canvas>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="myPieChart"></canvas>
+                    </div>
+
+                    <!-- Gender Distribution Over Time -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Gender Distribution Over Time</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="genderChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <!-- Gender Distribution -->
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-venus-mars mr-2"></i>Gender Distribution</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
+                <!-- City Based Sales Percentage -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-city mr-2"></i>City Based Sales Percentage by Month</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="demograph1"></canvas>
+                            <div class="card-body">
+                                <div class="chart-container" style="min-height: 400px;">
+                                    <canvas id="citySalesPercentageChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Gender Distribution Over Time -->
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Gender Distribution Over Time</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
+                <!-- Year-over-Year Growth -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Year-over-Year (YoY) Sales Growth</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="genderChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- City Based Sales Percentage -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-city mr-2"></i>City Based Sales Percentage by Month</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container" style="min-height: 400px;">
-                                <canvas id="citySalesPercentageChart"></canvas>
+                            <div class="card-body">
+                                <div class="chart-container" style="min-height: 400px;">
+                                    <canvas id="yoyGrowthChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Year-over-Year Growth -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Year-over-Year (YoY) Sales Growth</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
+                <!-- Customer Segmentation -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-users mr-2"></i>Customer Segmentation</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container" style="min-height: 400px;">
-                                <canvas id="yoyGrowthChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer Segmentation -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><i class="fas fa-users mr-2"></i>Customer Segmentation</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                                    <i class="fas fa-expand"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container" style="min-height: 450px;">
-                                <canvas id="customerSegmentationChart"></canvas>
+                            <div class="card-body">
+                                <div class="chart-container" style="min-height: 450px;">
+                                    <canvas id="customerSegmentationChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -486,6 +562,9 @@ if($_SESSION['role']=="Admin"){
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <?php include_once "footer.php"; ?>
 </div>
 
 <script>
@@ -827,7 +906,3 @@ if($_SESSION['role']=="Admin"){
         format: 'YYYY-MM-DD'
     });
 </script>
-
-<?php
-include_once "footer.php";
-?>
