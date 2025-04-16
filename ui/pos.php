@@ -126,8 +126,23 @@ if (isset($_POST['btnsaveorder'])) {
     $arr_price = $_POST['price_c_arr'];
     $arr_total = $_POST['saleprice_arr'];
 
-    $insert = $pdo->prepare("INSERT INTO tbl_invoice (customer_id, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid, repay) VALUES (:customer_id, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid, :repay)");
+    $insert = $pdo->prepare("INSERT INTO tbl_invoice (customer_id,phone, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid, repay) VALUES (:customer_id,:phone, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid, :repay)");
     $insert->bindParam(':customer_id', $customer_id);
+    $insert->bindParam(':phone', $phone);
+    $insert->bindParam(':orderdate', $orderdate);
+    $insert->bindParam(':subtotal', $subtotal);
+    $insert->bindParam(':discount', $discount);
+    $insert->bindParam(':sgst', $sgst);
+    $insert->bindParam(':cgst', $cgst);
+    $insert->bindParam(':total', $total);
+    $insert->bindParam(':payment_type', $payment_type);
+    $insert->bindParam(':due', $due);
+    $insert->bindParam(':paid', $paid);
+    $insert->bindParam(':repay', $repay);
+    $insert->execute();
+    $insert = $pdo->prepare("INSERT INTO tbl_invoice_history (customer_id,phone, order_date, subtotal, discount, sgst, cgst, total, payment_type, due, paid, repay) VALUES (:customer_id,:phone, :orderdate, :subtotal, :discount, :sgst, :cgst, :total, :payment_type, :due, :paid, :repay)");
+    $insert->bindParam(':customer_id', $customer_id);
+    $insert->bindParam(':phone', $phone);
     $insert->bindParam(':orderdate', $orderdate);
     $insert->bindParam(':subtotal', $subtotal);
     $insert->bindParam(':discount', $discount);
@@ -150,14 +165,24 @@ if (isset($_POST['btnsaveorder'])) {
     $insert->execute();
 
     $invoice_id = $pdo->lastInsertId();
+
+      // Insert invoice_id, due, and phone into customer_ids table
+  $insertCustomerIds = $pdo->prepare("INSERT INTO customer_ids (invoice_id, due, phone) VALUES (:invoice_id, :due, :phone)");
+  $insertCustomerIds->bindParam(':invoice_id', $invoice_id);
+  $insertCustomerIds->bindParam(':due', $due);
+  $insertCustomerIds->bindParam(':phone', $phone);
+  $insertCustomerIds->execute();
+
     if ($invoice_id != null) {
         for ($i = 0; $i < count($arr_pid); $i++) {
             $rem_qty = $arr_stock[$i] - $arr_qty[$i];
             if ($rem_qty < 0) {
                 return "Order is not completed";
             } else {
-                $update = $pdo->prepare("update tbl_product SET stock='$rem_qty' where pid='" . $arr_pid[$i] . "'");
-                $update->execute();
+                $update = $pdo->prepare("UPDATE tbl_product SET stock = :rem_qty WHERE pid = :pid");
+        $update->bindParam(':rem_qty', $rem_qty);
+        $update->bindParam(':pid', $arr_pid[$i]);
+        $update->execute();
             }
 
             $insert = $pdo->prepare("insert into tbl_invoice_details (invoice_id, customer_id, barcode, product_id, product_name, qty, rate, saleprice, order_date) values (:invid, :customer_id, :barcode, :pid, :name, :qty, :rate, :saleprice, :order_date)");
@@ -191,6 +216,34 @@ $select->execute();
 $row = $select->fetch(PDO::FETCH_OBJ);
 ?>
 
+<style type="text/css">
+  .tableFixHead {
+    overflow: scroll;
+    height: 520px;
+  }
+
+  .tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100px;
+  }
+
+  th,
+  td {
+    padding: 8px 16px;
+  }
+
+  th {
+    background: #eee;
+  }
+</style>
+
+
 <!-- Content Wrapper. Contains page content -->
 <div class="wrapper">
     <div class="content-wrapper">
@@ -199,7 +252,7 @@ $row = $select->fetch(PDO::FETCH_OBJ);
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Point Of Sale</h1>
+                        <h1 class="m-0">Pos</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
