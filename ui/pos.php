@@ -56,6 +56,32 @@
         padding: 8px 16px;
     }
 </style>
+<style type="text/css">
+  .tableFixHead {
+    overflow: scroll;
+    height: 520px;
+  }
+
+  .tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100px;
+  }
+
+  th,
+  td {
+    padding: 8px 16px;
+  }
+
+  th {
+    background: #eee;
+  }
+</style>
 <?php
 ob_start();
 include_once 'connectdb.php';
@@ -166,12 +192,12 @@ if (isset($_POST['btnsaveorder'])) {
 
     $invoice_id = $pdo->lastInsertId();
 
-      // Insert invoice_id, due, and phone into customer_ids table
-  $insertCustomerIds = $pdo->prepare("INSERT INTO customer_ids (invoice_id, due, phone) VALUES (:invoice_id, :due, :phone)");
-  $insertCustomerIds->bindParam(':invoice_id', $invoice_id);
-  $insertCustomerIds->bindParam(':due', $due);
-  $insertCustomerIds->bindParam(':phone', $phone);
-  $insertCustomerIds->execute();
+    // Insert invoice_id, due, and phone into customer_ids table
+    $insertCustomerIds = $pdo->prepare("INSERT INTO customer_ids (invoice_id, due, phone) VALUES (:invoice_id, :due, :phone)");
+    $insertCustomerIds->bindParam(':invoice_id', $invoice_id);
+    $insertCustomerIds->bindParam(':due', $due);
+    $insertCustomerIds->bindParam(':phone', $phone);
+    $insertCustomerIds->execute();
 
     if ($invoice_id != null) {
         for ($i = 0; $i < count($arr_pid); $i++) {
@@ -180,9 +206,9 @@ if (isset($_POST['btnsaveorder'])) {
                 return "Order is not completed";
             } else {
                 $update = $pdo->prepare("UPDATE tbl_product SET stock = :rem_qty WHERE pid = :pid");
-        $update->bindParam(':rem_qty', $rem_qty);
-        $update->bindParam(':pid', $arr_pid[$i]);
-        $update->execute();
+                $update->bindParam(':rem_qty', $rem_qty);
+                $update->bindParam(':pid', $arr_pid[$i]);
+                $update->execute();
             }
 
             $insert = $pdo->prepare("insert into tbl_invoice_details (invoice_id, customer_id, barcode, product_id, product_name, qty, rate, saleprice, order_date) values (:invid, :customer_id, :barcode, :pid, :name, :qty, :rate, :saleprice, :order_date)");
@@ -215,34 +241,6 @@ $select = $pdo->prepare("select * from tbl_taxdis where taxdis_id =1");
 $select->execute();
 $row = $select->fetch(PDO::FETCH_OBJ);
 ?>
-
-<style type="text/css">
-  .tableFixHead {
-    overflow: scroll;
-    height: 520px;
-  }
-
-  .tableFixHead thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100px;
-  }
-
-  th,
-  td {
-    padding: 8px 16px;
-  }
-
-  th {
-    background: #eee;
-  }
-</style>
-
 
 <!-- Content Wrapper. Contains page content -->
 <div class="wrapper">
@@ -514,8 +512,6 @@ $row = $select->fetch(PDO::FETCH_OBJ);
     <?php include_once "footer.php"; ?>
 </div>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 $(document).ready(function() {
@@ -719,6 +715,7 @@ $(document).ready(function() {
             $('#txtrepay').val('0');
         } else if (selectedPayment === 'Cash') {
             dueInput.closest('.input-group').hide();
+            totalDueDiv.show();
             totalDueDiv.hide();
             repayDiv.show();
             paidInput.val('');
@@ -789,33 +786,37 @@ $(document).ready(function() {
 
     function calculateDOB(age) {
         let today = new Date();
-        let birthYear = today.getFullYear() - age;
-        let birthMonth = today.getMonth();
+        let birthYear = today.getFullYear() - parseInt(age);
+        let birthMonth = today.getMonth() + 1; // Months are 0-indexed in JS
         let birthDay = today.getDate();
-        return `${birthYear}-${String(birthMonth + 1).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
+        return `${birthYear}-${birthMonth.toString().padStart(2, '0')}-${birthDay.toString().padStart(2, '0')}`;
     }
 
     toggle.on("change", function() {
         if (this.checked) {
             ageInput.prop("readonly", false);
             dobInput.prop("readonly", true);
-            dobInput.val("");
+            dobInput.val(""); // Clear DOB when switching to manual age
+            ageInput.val(""); // Clear age to prompt user input
         } else {
             ageInput.prop("readonly", true);
             dobInput.prop("readonly", false);
-            ageInput.val("");
+            ageInput.val(""); // Clear age when switching to DOB input
+            dobInput.val(""); // Clear DOB to prompt user input
         }
     });
 
     dobInput.on("input", function() {
-        if (!toggle.is(":checked")) {
-            ageInput.val(calculateAge(this.val()));
+        if (!toggle.is(":checked") && this.value) {
+            const age = calculateAge(this.value);
+            ageInput.val(age >= 0 ? age : "");
         }
     });
 
     ageInput.on("input", function() {
-        if (toggle.is(":checked") && this.val()) {
-            dobInput.val(calculateDOB(this.val()));
+        if (toggle.is(":checked") && this.value) {
+            const dob = calculateDOB(this.value);
+            dobInput.val(dob);
         }
     });
 });
