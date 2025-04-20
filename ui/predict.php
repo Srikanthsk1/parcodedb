@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header>
         <h1>📊 Prediction Dashboard </h1>
-        <div class="dashboard-container"><a href="dashboard.php" class="dashboard-btn">Dashboard</a></div>
+        <div class="dashboard-container"><a href="graphreport_fixed.php" class="dashboard-btn">Dashboard</a></div>
     </header>
 
     <section class="form-section">

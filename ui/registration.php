@@ -12,26 +12,23 @@
         height: 100vh;
     }
 
-    /* Wrapper to handle layout */
     .wrapper {
         display: flex;
         flex-direction: column;
-        min-height: 100vh; /* Full viewport height */
+        min-height: 100vh;
     }
 
-    /* Sidebar - fixed and non-scrollable */
     .main-sidebar {
         position: fixed !important;
         top: 0;
         left: 0;
-        width: 250px; /* AdminLTE sidebar width */
-        height: 100vh; /* Full viewport height */
-        overflow: hidden !important; /* Prevent scrolling */
+        width: 250px;
+        height: 100vh;
+        overflow: hidden !important;
         z-index: 1000;
-        background: #343a40; /* AdminLTE sidebar background */
+        background: #343a40;
     }
 
-    /* Ensure sidebar content doesn't scroll */
     .sidebar {
         height: 100%;
         max-height: 100vh;
@@ -39,47 +36,43 @@
         padding-bottom: 0;
     }
 
-    /* Prevent sidebar children from scrolling */
     .sidebar * {
         overflow: hidden !important;
     }
 
-    /* Main content area - scrollable */
     .content-wrapper {
         flex: 1;
-        overflow-y: auto; /* Enable content scrolling */
-        margin-left: 250px; /* Offset for sidebar */
-        padding-bottom: 60px; /* Space for footer */
-        min-height: calc(100vh - 60px); /* Stretch to footer */
+        overflow-y: auto;
+        margin-left: 250px;
+        padding-bottom: 60px;
+        min-height: calc(100vh - 60px);
     }
 
-    /* Footer - fixed and non-scrollable */
     .main-footer {
         position: fixed;
         bottom: 0;
-        width: calc(100% - 250px); /* Adjust for sidebar */
-        margin-left: 250px; /* Align with content */
-        background: #f4f6f9; /* AdminLTE footer background */
+        width: calc(100% - 250px);
+        margin-left: 250px;
+        background: #f4f6f9;
         padding: 10px;
         border-top: 1px solid #dee2e6;
         z-index: 999;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
         .content-wrapper {
-            margin-left: 0; /* Full width on mobile */
+            margin-left: 0;
         }
         .main-footer {
             margin-left: 0;
-            width: 100%; /* Full width */
+            width: 100%;
         }
         .main-sidebar {
-            transform: translateX(-250px); /* Hide sidebar off-screen */
+            transform: translateX(-250px);
             transition: transform 0.3s ease;
         }
         .main-sidebar.active {
-            transform: translateX(0); /* Show when toggled */
+            transform: translateX(0);
         }
         .sidebar {
             max-height: 100vh;
@@ -126,6 +119,7 @@ if (isset($_POST['btnsave'])) {
 
     // Additional fields for User role
     $company = isset($_POST['txtcompany']) ? $_POST['txtcompany'] : null;
+    $companywebsite = isset($_POST['txtcompanywebsite']) ? $_POST['txtcompanywebsite'] : null;
     $phone = isset($_POST['txtphone']) ? $_POST['txtphone'] : null;
     $address = isset($_POST['txtaddress']) ? $_POST['txtaddress'] : null;
 
@@ -139,14 +133,15 @@ if (isset($_POST['btnsave'])) {
             $_SESSION['status_code'] = "warning";
         } else {
             // Insert query with additional fields for User role
-            $insert = $pdo->prepare("INSERT INTO tbl_user (username, useremail, userpassword, role, company_name, phone, address) 
-                                     VALUES (:name, :email, :password, :role, :company, :phone, :address)");
+            $insert = $pdo->prepare("INSERT INTO tbl_user (username, useremail, userpassword, role, company_name, company_website, phone, address) 
+                                     VALUES (:name, :email, :password, :role, :company, :companywebsite, :phone, :address)");
 
             $insert->bindParam(':name', $username);
             $insert->bindParam(':email', $useremail);
             $insert->bindParam(':password', $userpassword);
             $insert->bindParam(':role', $userrole);
             $insert->bindParam(':company', $company);
+            $insert->bindParam(':companywebsite', $companywebsite);
             $insert->bindParam(':phone', $phone);
             $insert->bindParam(':address', $address);
 
@@ -219,6 +214,10 @@ if (isset($_POST['btnsave'])) {
                                         <div class="form-group">
                                             <label for="exampleInputCompany">Company Name</label>
                                             <input type="text" class="form-control" placeholder="Enter Company Name" name="txtcompany">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputCompanywebsite">Company Website</label>
+                                            <input type="text" class="form-control" placeholder="Enter Company Website" name="txtcompanywebsite">
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleInputPhone">Phone Number</label>

@@ -484,27 +484,28 @@ INSERT INTO `tbl_taxdis` (`taxdis_id`, `sgst`, `cgst`, `discount`) VALUES
 --
 
 CREATE TABLE `tbl_user` (
-  `userid` int(11) NOT NULL,
+  `userid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(200) NOT NULL,
   `useremail` varchar(200) NOT NULL,
   `userpassword` varchar(200) NOT NULL,
   `role` varchar(50) NOT NULL,
   `company_name` varchar(255) DEFAULT NULL,
+  `company_website` varchar(255) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
-  `address` text DEFAULT NULL
+  `address` text DEFAULT NULL,
+  PRIMARY KEY (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_user`
 --
 
-INSERT INTO `tbl_user` (`userid`, `username`, `useremail`, `userpassword`, `role`, `company_name`, `phone`, `address`) VALUES
-(2, 'user', 'user@gmail.com', '123', 'User', 'User Company', '1234567890', 'User Address'),
-(15, 'Admin_2', 'admin2@gmail.com', '12345', 'Admin', NULL, NULL, NULL),
-(16, 'Admin', 'admin@gmail.com', '12345', 'Admin', NULL, NULL, NULL),
-(17, 'Sarath', 'sarath@gmail.com', '12345', 'User', 'Sarath Company', '9876543210', 'Sarath Address'),
-(19, 'Barath', 'b@gmail.com', '12345', 'Admin', NULL, NULL, NULL);
-
+INSERT INTO `tbl_user` (`userid`, `username`, `useremail`, `userpassword`, `role`, `company_name`, `company_website`, `phone`, `address`) VALUES
+(2, 'user', 'user@gmail.com', '123', 'User', 'User Company', 'https://usercompany.com', '1234567890', 'User Address'),
+(15, 'Admin_2', 'admin2@gmail.com', '12345', 'Admin', NULL, NULL, NULL, NULL),
+(16, 'Admin', 'admin@gmail.com', '12345', 'Admin', NULL, NULL, NULL, NULL),
+(17, 'Sarath', 'sarath@gmail.com', '12345', 'User', 'Sarath Company', 'https://sarathcompany.com', '9876543210', 'Sarath Address'),
+(19, 'Barath', 'b@gmail.com', '12345', 'Admin', NULL, NULL, NULL, NULL);
 --
 -- Indexes for dumped tables
 CREATE TABLE `customer_ids` (
@@ -574,8 +575,8 @@ ALTER TABLE `tbl_taxdis`
 --
 -- Indexes for table `tbl_user`
 --
-ALTER TABLE `tbl_user`
-  ADD PRIMARY KEY (`userid`);
+-- ALTER TABLE `tbl_user`
+--   ADD PRIMARY KEY (`userid`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -620,9 +621,9 @@ ALTER TABLE `tbl_taxdis`
 --
 -- AUTO_INCREMENT for table `tbl_user`
 --
-ALTER TABLE `tbl_user`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-COMMIT;
+-- ALTER TABLE `tbl_user`
+--   MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+-- COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

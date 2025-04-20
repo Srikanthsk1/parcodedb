@@ -1,11 +1,10 @@
 <?php
-
 session_start();
 if (!isset($_SESSION['useremail'])) {
     die('Error: User is not logged in.');
 }
 
-//call the FPDF library
+// Call the FPDF library
 require('fpdf/fpdf.php');
 
 include_once 'connectdb.php';
@@ -50,26 +49,24 @@ $pdf->SetTextColor(0, 0, 0); // Reset text color to Black (default)
 $pdf->SetFont('Arial', 'B', 8);
 $pdf->Cell(60, 5, 'PHONE NUMBER: ' . $phone, 0, 1, 'C');
 
-// Add address
-$pdf->SetFont('Arial', '', 8);
-$pdf->MultiCell(60, 5, $address, 0, 'C');
-
-// Line separator
-$pdf->Line(7, 28, 72, 28);
-$pdf->Ln(1);
-
-// Add invoice details
+// Add invoice details (Bill No)
 $pdf->SetFont('Arial', 'BI', 8);
 $pdf->Cell(20, 4, 'Bill No:', 0, 0, '');
 $pdf->SetFont('Courier', 'BI', 8);
 $pdf->Cell(40, 4, $row->invoice_id, 0, 1, '');
 
+// Add invoice details (Date)
 $pdf->SetFont('Arial', 'BI', 8);
 $pdf->Cell(20, 4, 'Date:', 0, 0, '');
 $pdf->SetFont('Courier', 'BI', 8);
 $pdf->Cell(40, 4, $row->order_date, 0, 1, '');
 
+// Line separator and gap
+$pdf->Line(7, 32, 72, 32); // Adjusted Y-coordinate to position below Date
+$pdf->Ln(5); // Increased gap between line separator and product table
+
 // Add product details
+$pdf->Ln(2); // Small gap before table
 $pdf->SetX(7);
 $pdf->SetFont('Courier', 'B', 8);
 $pdf->Cell(34, 5, 'PRODUCT', 1, 0, 'C');
@@ -157,15 +154,22 @@ $pdf->Cell(34, 5, 'DUE(Rs)', 1, 0, 'C');
 $pdf->Cell(31, 5, $row->due, 1, 1, 'C');
 
 // Add footer
+$pdf->Ln(5); // Add spacing before footer
 $pdf->SetX(7);
 $pdf->SetFont('Courier', 'B', 8);
-$pdf->Cell(25, 5, 'Important Notice:', 0, 1, '');
+$pdf->Cell(65, 5, 'Important Notice:', 0, 1, 'L');
 $pdf->SetX(7);
 $pdf->SetFont('Arial', '', 5);
-$pdf->Cell(75, 5, 'No Product Will Be Replaced Or Refunded If You Dont Have Bill With You', 0, 2, '');
+$pdf->MultiCell(65, 4, 'No Product Will Be Replaced Or Refunded If You Dont Have Bill With You', 0, 'L');
 $pdf->SetX(7);
 $pdf->SetFont('Arial', '', 5);
-$pdf->Cell(75, 5, 'You Can Refund Within 2 Days Of Purchase', 0, 2, '');
+$pdf->MultiCell(65, 4, 'You Can Refund Within 2 Days Of Purchase', 0, 'L');
+
+// Add address at the bottom
+$pdf->Ln(2); // Add spacing before address
+$pdf->SetX(7);
+$pdf->SetFont('Arial', '', 8);
+$pdf->MultiCell(65, 5, 'Address: ' . $address, 0, 'L');
 
 $pdf->Output();
 ?>

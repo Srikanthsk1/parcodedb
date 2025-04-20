@@ -67,9 +67,9 @@
 include_once 'connectdb.php';
 session_start();
 
-if($_SESSION['useremail']=="" OR $_SESSION['role']=="User") {
-    header('location:../index.php');
-}
+// if($_SESSION['useremail']=="" OR $_SESSION['role']=="User") {
+//     header('location:../index.php');
+// }
 
 if($_SESSION['role']=="Admin") {
     include_once'header.php';
@@ -262,10 +262,7 @@ if(isset($_SESSION['status']) && $_SESSION['status']!='') {
         title: '<?php echo $_SESSION['status'];?>'
     });
 </script>
-<?php
-    unset($_SESSION['status']);
-}
-?>
+
 
 <script>
 $(document).ready(function() {
@@ -280,3 +277,7 @@ $(document).ready(function() {
     });
 });
 </script>
+<?php
+    unset($_SESSION['status']);
+}
+?>
